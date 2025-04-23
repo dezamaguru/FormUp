@@ -9,8 +9,8 @@ const handleRefreshToken = async (req, res) => {
         return res.sendStatus(401);
     }
     console.log(cookies.jwt);
-    const refreshToken = cookies.jwt;
 
+    const refreshToken = cookies.jwt;
     const foundUser = await Users.findOne({ where: { token: refreshToken } });
 
         if(!foundUser) {
@@ -28,11 +28,12 @@ const handleRefreshToken = async (req, res) => {
                 { 
                     'UserInfo': {
                         'email': decoded.email,
-                        'type': decoded.type, 
+                        'type': decoded.type,
+                        'userId' : decoded.userId,
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '10m' /* set to 15m later */ }
+                { expiresIn: '15m' /* set to 15m later */ }
             );
             res.json({ accessToken });
         }
