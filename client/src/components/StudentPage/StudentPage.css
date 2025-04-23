@@ -1,0 +1,210 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to  right, #c9e0f6, #ffffff);
+  min-height: 100vh;
+}
+
+.student-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: white;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 30px; /* colțuri rotunde */
+  margin: 1rem; /* spațiu față de marginea paginii */
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* opțional pentru profunzime */
+}
+
+
+.logo {
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.nav-links a {
+  display: block;
+  margin: 1rem 0;
+  text-decoration: none;
+  color: #1e293b;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+}
+
+.nav-links a:hover {
+  background: #cbd5e1;
+}
+
+.sign-out {
+  background: #67a5f8;
+  color: white;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  width: 50%;
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* distribuie spațiul între header și dashboard */
+  padding: 2rem;
+}
+
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Header buttons */
+.header-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.icon-button {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.icon-button:hover {
+  background: #e2e8f0;
+}
+
+.avatar-button {
+  font-size: 1.3rem;
+  background: #dbeafe;
+}
+
+/* Dashboard grid */
+.dashboard {
+  display: grid;
+  grid-template-areas: 
+    "classes attendance news"
+    "classes calendar  news";
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+
+/* Card style */
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+/* Classes */
+.class-card {
+  background: #f1f5f9;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+/* Attendance */
+.attendance select,
+.attendance input[type="time"] {
+  display: block;
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+}
+
+.pager {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.pager button {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #67a5f8;
+  color: white;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* Calendar */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.3rem;
+  margin-top: 1rem;
+}
+
+.calendar-grid div {
+  background: #e2e8f0;
+  padding: 0.6rem;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.calendar-grid .active {
+  background: #3b82f6;
+  color: white;
+}
+
+/* News */
+.news-box {
+  margin-top: 1rem;
+}
+
+.news-box img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.read-more {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: #67a5f8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}

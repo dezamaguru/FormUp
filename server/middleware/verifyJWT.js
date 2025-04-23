@@ -20,6 +20,7 @@ const verifyJWT = (req, res, next) => {
             // req.type = decoded.type;
             req.email = decoded.UserInfo.email;
             req.type = decoded.UserInfo.type;
+            req.userId = decoded.UserInfo.userId;
             next();
         }
     );

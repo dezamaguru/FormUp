@@ -6,6 +6,9 @@ import AddUser from './components/AddUser';
 import Users from './components/Users/Users';
 import Layout from './components/Layout';
 import RequireAuth from './components/RequireAuth';
+import Cereri from './components/CereriPage/CereriPage';
+import Adevererinte from './components/AdeverintePage/AdeverintePage';
+import AdeverintaSolicitata from './components/AdeverintePage/AdeverintaSolicitata';
 
 function App() {
   return (
@@ -18,6 +21,9 @@ function App() {
               <Route path='/home' element={<Home/>} />
               <Route path='/adduser' element={<AddUser/>} />
               <Route path='/users' element={<Users/>} />
+              <Route path='/cereri' element={<Cereri/>} />
+              <Route path='/adeverinte' element={<Adevererinte/>} />
+              <Route path='/adeverinte/:id' element={<AdeverintaSolicitata/>} />
               
             </Route>
           </Route>"

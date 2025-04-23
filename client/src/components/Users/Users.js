@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const Users = () => {
+function Users() {
     const [users, setUsers] = useState();
     //const refresh = useRefreshToken();
     const axiosPrivate = useAxiosPrivate(); 
@@ -27,7 +27,7 @@ const Users = () => {
                 if (error.name === 'CanceledError') {
                     console.log('Request canceled:', error.message); // Handle cancellation gracefully
                 } else {
-                        console.error(error);
+                    console.error(error.response.data);
                         navigate('/', { state: { from: location }, replace: true });
                     }
                 }         
