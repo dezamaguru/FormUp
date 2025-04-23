@@ -27,10 +27,31 @@ module.exports = (sequelize, DataTypes) =>{
             type: DataTypes.STRING
         },
         type: {
-            type: DataTypes.STRING,
+            type: DataTypes.ENUM('student', 'admin', 'secretar'),
             allowNull: false
+        },
+        program_studiu: {
+            type: DataTypes.ENUM('licenta', 'master'),
+            allowNull: false
+        },
+        an_studiu: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        grupa: {
+            type: DataTypes.STRING,
+        },
+        forma_finantare: {
+            type: DataTypes.ENUM('buget', 'taxa', 'null'),
+//allowNull: false
+            //allowNull: false
+        },
+        forma_invatamant: {
+            type: DataTypes.ENUM('IF', 'ID'//allowNull: false
+, 'null'),
+            //allowNull: alse
         }
     })
 
-    return Users
-}
+    return Users;
+};

@@ -1,13 +1,12 @@
-const  { Adeverinte } = require('../models');
+const { Solicitari_Adeverinte, Users} = require('../models');
 
 const getAllAdeverinte = async(req, res) =>{
     try{
-
         if(req.type === 'student') {
-            const adeverinte = await Adeverinte.findAll( {
-                attributes: ['id', 'tip_adeverinta', 'id_student', 'nume_student', 'status'],
+            const adeverinte = await Solicitari_Adeverinte.findAll( {
+                attributes: ['id_adeverinta', 'tip_adeverinta', 'userId', 'nume_student', 'status'],
                 where: {
-                    id_student: req.userId, 
+                    userId: req.userId, 
                 }
             });
 
@@ -16,8 +15,22 @@ const getAllAdeverinte = async(req, res) =>{
         }
 
         if(req.type === 'secretar') {
-            const adeverinte = await Adeverinte.findAll( {
-                attributes: ['id', 'tip_adeverinta', 'id_student', 'nume_student', 'status']
+            const secretar = await Users.findByPk(req.userId);
+            if (!secretar) {
+                return res.status(404).json({ message: "Profilul secretarului nu a fost găsit" });
+            } 
+
+            const adeverinte = await Solicitari_Adeverinte.findAll( {
+                attributes: ['id_adeverinta', 'tip_adeverinta', 'userId', 'nume_student', 'status'],
+                include :{
+                    model: Users,
+                    attributes: ['program_studiu', 'an_studiu'],
+                    where:{
+                        program_studiu: secretar.program_studiu,
+                        an_studiu: secretar.an_studiu,
+                        type: 'student'
+                    }
+                }
             });
 
             //console.log('Adeverințe preluate:', adeverinte); 
@@ -43,9 +56,9 @@ const adaugaSolicitare = async (req, res) => {
             });
         }
 
-        const newAdeverinta = await Adeverinte.create({
+        const newAdeverinta = await Solicitari_Adeverinte.create({
             tip_adeverinta: tipAdeverinta,
-            id_student: req.userId,
+            userId: req.userId,
             nume_student: name,
             status: "Trimisa",
         }); 
@@ -65,13 +78,13 @@ const adaugaSolicitare = async (req, res) => {
 
 const getOneAdeverinta = async(req, res) => {
     try{
-        const adeverinta = await Adeverinte.findOne( {
+        const adeverinta = await Solicitari_Adeverinte.findOne( {
             where: {
-                id: req.params.id,
+                id_adeverinta: req.params.id,
             }
         });
 
-        //console.log('Adeverința preluata cu succes:', adeverinta); 
+        console.log('Adeverința preluata cu succes:', adeverinta); 
         res.json(adeverinta);
     } catch (err) {
         console.error('Eroare la getOneAdeverinta:', err); 
@@ -90,15 +103,15 @@ const uploadAdeverintaSolicitata = async (req, res) => {
             .json({message: "Fisierul trebuie incarcat obligatoriu"});
         }
 
-        await Adeverinte.update(
+        await Solicitari_Adeverinte.update(
             {
                 mime_type: file.mimetype,
                 file_data: file.buffer,
-                status: "Procesata"
+                status: "Aprobata"
             },
             {
                 where: {
-                    id: req.params.id
+                    id_adeverinta: req.params.id
                 }
             }
         );
@@ -114,7 +127,7 @@ const uploadAdeverintaSolicitata = async (req, res) => {
 
 const downloadAdeverintaSolicitata = async (req, res) => {
     try {
-        const adeverinta = await Adeverinte.findByPk(req.params.id,
+        const adeverinta = await Solicitari_Adeverinte.findByPk(req.params.id,
             {
                 attributes: ['tip_adeverinta', 'mime_type', 'file_data'],
             }

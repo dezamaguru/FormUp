@@ -17,13 +17,13 @@ app.use(cookieParser());
 const db = require('./models')
 
 // Routes
-app.use('/login', require('./routes/login'));
-app.use('/register', require('./routes/register'));
-app.use('/refresh', require('./routes/refresh'));
-app.use('/users', require('./routes/users'));
-app.use('/logout', require('./routes/logout'));
-app.use('/cereri', require('./routes/cereri'));
-app.use('/adeverinte', require('./routes/adeverinte'));
+app.use('/login', require('./routes/loginRoute'));
+app.use('/register', require('./routes/registerRoute'));
+app.use('/refresh', require('./routes/refreshRoute'));
+app.use('/users', require('./routes/usersRoute'));
+app.use('/logout', require('./routes/logoutRoute'));
+app.use('/cereri', require('./routes/cereriRoute'));
+app.use('/adeverinte', require('./routes/adeverinteRoute'));
 
 // db.sequelize.sync().then(() => {
 //     app.listen(3500, () => {
