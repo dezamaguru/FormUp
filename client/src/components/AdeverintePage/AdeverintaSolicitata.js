@@ -12,7 +12,7 @@ const AdeverintaSolicitata = () => {
     const [file, setFile] = useState(null);
 
     useEffect(() => {
-        const fetchAdeverinta = async () => {
+        const getOneAdeverinta = async () => {
             try {
                 const res = await axiosPrivate.get(`/adeverinte/${id}`);
                 setAdeverinta(res.data);  
@@ -21,7 +21,7 @@ const AdeverintaSolicitata = () => {
             }
         }
 
-        fetchAdeverinta();
+        getOneAdeverinta();
     }, [id, axiosPrivate]);
 
     const handleUploadAdeverintaSolicitata = async (e) => {
@@ -111,7 +111,7 @@ const AdeverintaSolicitata = () => {
                     <p><strong>Nume Student:</strong> {adeverinta.nume_student}</p>
                     <p><strong>Status:</strong> {adeverinta.status}</p>
 
-                    {adeverinta.status === 'Procesata' && (
+                    {adeverinta.status === 'Aprobata' && (
                         <div>
                             <p><strong>Se poate descarca</strong></p>
                             <button onClick={() => handleDownloadAdeverinta()}>Descarca adeverinta</button>

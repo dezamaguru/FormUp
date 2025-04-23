@@ -1,6 +1,7 @@
+
 module.exports = (sequelize, DataTypes) => {
-    const Adeverinte = sequelize.define("Adeverinte", {
-        id: {
+    const Solicitari_Adeverinte = sequelize.define("Solicitari_Adeverinte", {
+        id_adeverinta: {
             type: DataTypes.INTEGER,
             allowNull: false,
             autoIncrement: true,
@@ -10,26 +11,38 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(255),
             allowNull: false 
         },
-        id_student: {
+        userId: {
             type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'Users', // Numele tabelului asociat
+                key: 'userId'
+            },
+            onDelete: 'CASCADE' // Șterge solicitările dacă utilizatorul este șters
         },
         nume_student:{
             type: DataTypes.STRING(255),
-            // allowNull: false 
+            allowNull: false 
         },
         status:{
+            type: DataTypes.ENUM('Trimisa', 'Procesare','Aprobata', 'Respinsa'),
+            allowNull: false 
+        },
+        filename: {
             type: DataTypes.STRING(255),
-            // allowNull: false 
+            //allowNull: false
         },
         mime_type:{
             type: DataTypes.STRING(100),
+            //allowNull: false 
         },
         file_data: {
             type: DataTypes.BLOB("long"), // Echivalent pentru LONGBLOB
+            //allowNull: false 
         },
     }, {
-        tableName: 'adeverinte'
+        tableName: 'Solicitari_adeverinte'
     });
 
-    return Adeverinte;
+    return Solicitari_Adeverinte;
 };

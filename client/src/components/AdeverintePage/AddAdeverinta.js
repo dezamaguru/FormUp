@@ -2,31 +2,35 @@ import React from 'react';
 import { useState } from 'react';
 import './AddAdeverinta.css';
 import { axiosPrivate } from '../../api/axios';
+import './AdeverintePage.js';
 
-const AddAdeverinta = () => {
-    const [name, setName] = useState('');
-    const [tipAdeverinta, setTipAdeverinta] = useState('');
+const AddAdeverinta = ({ onAdd }) => {
+  const [name, setName] = useState('');
+  const [tipAdeverinta, setTipAdeverinta] = useState('');
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        if (!name || !tipAdeverinta) {
-            alert('Te rugăm să completezi toate câmpurile!');
-            return;
-        }
+    if (!name || !tipAdeverinta) {
+      alert('Te rugăm să completezi toate câmpurile!');
+      return;
+    }
 
-        try {
-            const res = await axiosPrivate.post('/adeverinte/upload', {
-                name: name,
-                tipAdeverinta: tipAdeverinta
-            });
-            
-            console.log("Adeverinta :", res.data);
-            setName('');
-            setTipAdeverinta('');
-        } catch (err) {
-            console.error('Eroare la trimiterea cererii:', err.response?.data);
-        }
+    try {
+      const res = await axiosPrivate.post('/adeverinte/upload', {
+        name,
+        tipAdeverinta
+      });
+
+      console.log("Adeverinta :", res.data);
+      setName('');
+      setTipAdeverinta('');
+
+      if (onAdd) onAdd();
+
+    } catch (err) {
+      console.error('Eroare la trimiterea cererii:', err.response?.data);
+    }
     };
 
   return (

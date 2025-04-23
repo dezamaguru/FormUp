@@ -40,4 +40,8 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+//Relatiile dintre modele
+db.Users.hasMany(db.Solicitari_Adeverinte, { foreignKey: 'userId' });
+db.Solicitari_Adeverinte.belongsTo(db.Users, { foreignKey: 'userId' });
+
 module.exports = db;

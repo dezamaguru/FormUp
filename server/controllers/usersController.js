@@ -11,7 +11,7 @@ const getAllUsers = async (req, res) => {
 }
 
 const registerUser = async (req, res) => {
-    const { lastName, firstName, email, password, type } = req.body;
+    const { lastName, firstName, email, password, type, program_studiu, an_studiu } = req.body;
     
         try {
             const hash = await bcrypt.hash(password, 10);
@@ -21,6 +21,8 @@ const registerUser = async (req, res) => {
                 email: email,
                 password: hash,
                 type: type,
+                program_studiu: program_studiu,
+                an_studiu : an_studiu
             });
             res.json({ message: "User created successfully" });
         } catch (error) {

@@ -6,7 +6,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import  useAxiosPrivate  from '../../hooks/useAxiosPrivate';
 import useAuth from '../../hooks/useAuth';
 
-
 function AdeverintePage() {
     const [showDropDown, setShowDropDown] = useState(false);
     const [adeverinte, setAdeverinte] = useState([]);
@@ -15,35 +14,36 @@ function AdeverintePage() {
     const location = useLocation();
     const { auth } = useAuth();
 
+    const getAdeverinte = async (controller = new AbortController(), isMounted = true) => {
+        try {
+            const response = await axiosPrivate.get('/adeverinte', {
+                signal: controller.signal,
+            });
+            if (isMounted) {
+                setAdeverinte(response.data);
+            }
+        } catch (error) {
+            if (error.name === 'CanceledError') {
+                console.log('Request canceled:', error.message);
+            } else {
+                console.error(error.response?.data);
+                navigate('/', { state: { from: location }, replace: true });
+            }
+        }
+    };
+
     useEffect(() => {
         let isMounted = true;
         const controller = new AbortController();
-
-        const getAdeverinte = async () => {
-            try{
-                const response = await axiosPrivate.get('/adeverinte', {
-                    signal: controller.signal,
-                });
-                if(isMounted) {
-                    setAdeverinte(response.data);
-                }
-            } catch(error){
-                if (error.name === 'CanceledError') {
-                    console.log('Request canceled:', error.message); // Handle cancellation gracefully
-                } else {
-                        console.error(error.response.data);
-                        navigate('/', { state: { from: location }, replace: true });
-                    }
-            }
-        }
-
-        getAdeverinte();
-
+    
+        getAdeverinte(controller, isMounted);
+    
         return () => {
             isMounted = false;
             controller.abort();
         };
     }, [axiosPrivate, navigate, location]);
+    
 
     const handleClick = (id) => {
         navigate(`/adeverinte/${id}`); // navigheaza catre adeverinta solicitata
@@ -59,7 +59,7 @@ function AdeverintePage() {
                 <br/>
 
                 <button onClick={ () => setShowDropDown( ((prev) => !prev))}>Adauga cerere</button>
-                { showDropDown && <AddAdeverinta/> }
+                { showDropDown && <AddAdeverinta onAdd={getAdeverinte} />  }
 
                 <br/>
                 <br/>
@@ -69,8 +69,8 @@ function AdeverintePage() {
                     ? (
                         <ul>
                             {adeverinte.map(adeverinta => (
-                                <li key={adeverinta.id} onClick={() => handleClick(adeverinta.id)}>
-                                    Solicitare adeverinta {adeverinta.tip_adeverinta} - {adeverinta.nume_student}
+                                <li key={adeverinta.id_adeverinta} onClick={() => handleClick(adeverinta.id_adeverinta)}>
+                                    Solicitare adeverinta {adeverinta.tip_adeverinta} - {adeverinta.nume_student} - {adeverinta.status}
                                 </li>
                             ))}
                         </ul>
@@ -91,7 +91,7 @@ function AdeverintePage() {
                     ? (
                         <ul>
                             {adeverinte.map(adeverinta => (
-                                <li key={adeverinta.id} onClick={() => handleClick(adeverinta.id)}>
+                                <li key={adeverinta.id_adeverinta} onClick={() => handleClick(adeverinta.id_adeverinta)}>
                                     Solicitare adeverinta {adeverinta.tip_adeverinta} - {adeverinta.nume_student}
                                 </li>
                             ))}
