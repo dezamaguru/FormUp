@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
     const Cereri = sequelize.define("Cereri", {
-        id: {
+        id_cerere: {
             type: DataTypes.INTEGER,
             allowNull: false,
             autoIncrement: true,
@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
         title: {
             type: DataTypes.STRING(255),
             allowNull: false 
+        },
+        type :{
+            type: DataTypes.ENUM('licenta', 'master', 'comun','altele'),
+            //allowNull: false 
         },
         mime_type: {
             type: DataTypes.STRING(100),
@@ -21,11 +25,6 @@ module.exports = (sequelize, DataTypes) => {
         file_data: {
             type: DataTypes.BLOB("long"), // Echivalent pentru LONGBLOB
             allowNull: false 
-        },
-        uploaded_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW 
         }
     }, {
         tableName: 'cereri' // Specifică explicit numele tabelului

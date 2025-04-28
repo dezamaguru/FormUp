@@ -1,14 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from "react-router-dom";
+import SideBar from "../SideBar/SideBar";
+import useAuth from "../../hooks/useAuth";
 
 function Cereri() {
   const [cereri, setCereri] = useState([]);
   const [file, setFile] = useState(null);
-  const [title, setTitle] = useState('');
-  const axiosPrivate = useAxiosPrivate(); 
+  const [title, setTitle] = useState("");
+  const [type, setType] = useState("");
+  const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const location = useLocation();
+  const { auth } = useAuth();
 
   useEffect(() => {
     let isMounted = true;
@@ -16,19 +20,19 @@ function Cereri() {
 
     const getCereri = async () => {
       try {
-        const response = await axiosPrivate.get('/cereri', {
+        const response = await axiosPrivate.get("/cereri", {
           signal: controller.signal,
         });
         if (isMounted) {
           setCereri(response.data);
         }
       } catch (error) {
-        if (error.name === 'CanceledError') {
-          console.log('Request canceled:', error.message); // Handle cancellation gracefully
-      } else {
-        console.error(error.response.data);
-              navigate('/', { state: { from: location }, replace: true });
-          }
+        if (error.name === "CanceledError") {
+          console.log("Request canceled:", error.message); // Handle cancellation gracefully
+        } else {
+          console.error(error.response.data);
+          navigate("/", { state: { from: location }, replace: true });
+        }
       }
     };
 
@@ -40,119 +44,126 @@ function Cereri() {
     };
   }, [axiosPrivate, navigate, location]);
 
-  const handleDownload = async (id) => {
-    try {
-      const res = await axiosPrivate.get(`/cereri/download/${id}`, {
-        responseType: 'blob'
-      });
-      
-      if (!res.data) {
-        throw new Error('Nu s-au primit date de la server');
-      }
-
-      // Corectăm extragerea numelui fișierului
-      const disposition = res.headers['content-disposition'];
-      let filename;
-      
-      if (disposition) {
-        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-        const matches = filenameRegex.exec(disposition);
-        if (matches != null && matches[1]) {
-          filename = matches[1].replace(/['"]/g, '');
-        }
-      }
-      
-      if (!filename) {
-        // Folosim numele din lista de cereri dacă îl avem
-        const cerere = cereri.find(c => c.id === id);
-        filename = cerere ? cerere.filename : `cerere_${id}`;
-      }
-
-      const blob = new Blob([res.data], { 
-        type: res.headers['content-type'] || 'application/octet-stream' 
-      });
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = filename;
-      
-      document.body.appendChild(a);
-      a.click();
-      
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch(err) {
-      console.error('Eroare la descărcare:', err);
-      alert('A apărut o eroare la descărcarea fișierului. Vă rugăm să încercați din nou.');
-    }
-  };
-  
-
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!title || !file) return alert('Completează titlul și alege un fișier.');
+
+    if (!title || !file || !type)
+      return alert("Completează campurile și alege un fișier.");
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('file',  file);
-    
+    formData.append("title", title);
+    formData.append("type", type);
+    formData.append("file", file);
+
     try {
-        const res = await axiosPrivate.post('/cereri/upload', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        
-        // Adăugăm noua cerere direct în state
-        setCereri(prev => [...prev, res.data.cerere]);
-        
-        // Resetăm formularul
-        setTitle('');
-        setFile(null);
+      const res = await axiosPrivate.post("/cereri/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Adăugăm noua cerere direct în state
+      setCereri((prev) => [...prev, res.data.cerere]);
+
+      // Resetăm formularul
+      setTitle("");
+      setType("");
+      setFile(null);
     } catch (err) {
-        console.error('Eroare completă:', err);
-        console.error('Răspuns server:', err.response?.data);
-        alert(err.response?.data?.message || 'Eroare la upload');
+      console.error("Eroare completă:", err);
+      console.error("Răspuns server:", err.response?.data);
+      alert(err.response?.data?.message || "Eroare la upload");
     }
   };
 
   return (
-    <div>
-      <h2>Cereri disponibile pentru descărcare</h2>
+    <div className="student-page">
+      <SideBar />
 
-      <form onSubmit={handleUpload} style={{ marginBottom: '20px' }}>
-        <input
-          type="text"
-          placeholder="Titlu cerere"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <input
-          type="file"
-          onChange={(e) => setFile(e.target.files[0])}
-          required
-        />
-        <button type="submit"> Încarcă cerere </button>
-      </form>
+      {/* Main Content */}
+      <main className="main-content">
+        {/* Top bar */}
+        <header className="header">
+          <h1>Welcome!</h1>
+          <div className="header-buttons">
+            <button className="icon-button" aria-label="Notifications">
+              🔔
+            </button>
+            <button className="icon-button avatar-button" aria-label="Profile">
+              👤
+            </button>
+          </div>
+        </header>
 
-      <article>
-        {Array.isArray(cereri) && cereri.length > 0 ? (
-          <ul>
-            {cereri.map(cerere => (
-              <li key={cerere.id}>
-                {cerere.title}
-                <button onClick={() => handleDownload(cerere.id)}>
-                   Descarcă 
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Nu există cereri disponibile.</p>
+        <h2>Cereri disponibile pentru descărcare</h2>
+
+        {auth?.type === "student" && (
+
+          <div className="dashboard"> 
+            <article>
+              {Array.isArray(cereri) && cereri.length > 0 ? (
+                <ul>
+                  {cereri.map((cerere) => (
+                    <li key={cerere.id_cerere} onClick={() => navigate(`/cereri/${cerere.id_cerere}`)}>
+                      {cerere.title}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Nu există cereri disponibile.</p>
+              )}
+            </article>
+          </div>
         )}
-      </article>
+
+        {auth?.type === "secretar" && (
+          <div>
+            <form onSubmit={handleUpload} style={{ marginBottom: "20px" }}>
+              <input
+                type="text"
+                placeholder="Titlu cerere"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                required
+              >
+                <option value="" disabled hidden>
+                  Alege tipul cererii
+                </option>
+                <option value="licenta">Licenta</option>
+                <option value="master">Master</option>
+                <option value="comun">Comun</option>
+                <option value="altele">Altele</option>
+              </select>
+
+              <input
+                type="file"
+                onChange={(e) => setFile(e.target.files[0])}
+                required
+              />
+              <button type="submit"> Încarcă cerere </button>
+            </form>
+
+            <article>
+              {Array.isArray(cereri) && cereri.length > 0 ? (
+                <ul>
+                  {cereri.map((cerere) => (
+                    <li key={cerere.id_cerere}>
+                      {cerere.title}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Nu există cereri disponibile.</p>
+              )}
+            </article>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

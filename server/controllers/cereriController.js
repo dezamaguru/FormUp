@@ -1,33 +1,72 @@
-const { Cereri } = require('../models');
+const { Cereri, Sequelize } = require('../models');
+const { Users } = require('../models');
 
 const getAllCereri = async (req, res) => {
   try {
-    const cereri = await Cereri.findAll( {
-      attributes: ['id', 'title', 'filename']
-    } );
-    console.log('Cereri preluate:', cereri); // Depanare
-    res.json(cereri);
+    const user = await Users.findByPk(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found in getAllCereri" });
+    }
+
+    let program_studiu = user.program_studiu;
+
+    if (user.type === "student") {
+      const cereri = await Cereri.findAll({
+        attributes: ["id_cerere", "title", "filename"],
+        where: {
+          type: {
+            [Sequelize.Op.in]: [program_studiu, "comun", "altele"], 
+          },
+        },
+      });
+
+      console.log("Cereri preluate:", cereri); 
+      return res.json(cereri); 
+    }
+
+    if (user.type === "secretar") {
+      const cereri = await Cereri.findAll({
+        attributes: ["id_cerere", "title", "filename"],
+      });
+
+      console.log("Cereri preluate:", cereri); 
+      return res.json(cereri); 
+    }
   } catch (err) {
-    console.error('Eroare la getAllCereri:', err); // Depanare
-    res.status(500).json({ err: err.message });
+    console.error("Eroare la getAllCereri:", err); 
+    return res.status(500).json({ err: err.message });
   }
 };
 
 const uploadCerere = async (req, res) => {
   try {
     const { title } = req.body;
+    const { type } = req.body;
     const file = req.file;
 
     console.log('Titlu:', title); // Depanare
     console.log('Fișier:', file); // Depanare
+    console.log('Type:', type); // Depanare
 
-    if (!file || !title) {
-      return res.status(400).json({ message: "Titlul și fișierul sunt obligatorii!" });
+    if (!file) {
+      return res.status(400)
+      .json({ message: "Fisierul nu a fost incarcat!" });
+    }
+
+    if (!title) {
+      return res.status(400)
+      .json({ message: "Titlul nu a fost completat!" });
+    }
+
+    if (!type) {
+      return res.status(400)
+      .json({ message: "Nu s-a ales tipul cererii!" });
     }
 
     // Creăm cererea și salvăm rezultatul
     const newCerere = await Cereri.create({
       title,
+      type,
       mime_type: file.mimetype,
       filename: file.originalname,
       file_data: file.buffer,
@@ -37,8 +76,9 @@ const uploadCerere = async (req, res) => {
     res.status(201).json({
       message: "Fișier salvat cu succes!",
       cerere: {
-        id: newCerere.id,
+        id_cerere: newCerere.id_cerere,
         title: newCerere.title,
+        type: newCerere.type,
         filename: newCerere.filename
       }
     });
@@ -50,8 +90,12 @@ const uploadCerere = async (req, res) => {
 
 const downloadCerere = async (req, res) => {
   try {
-    const cerere = await Cereri.findByPk(req.params.id, {
+
+    const cerere = await Cereri.findOne( {
       attributes: ['filename', 'mime_type', 'file_data'],
+      where: {
+          id_cerere: req.params.id,
+      }
     });
 
     if (!cerere) {
@@ -73,6 +117,22 @@ const downloadCerere = async (req, res) => {
     console.error('Eroare la descărcare:', err);
     res.status(500).json({ message: "Eroare la descărcarea fișierului", error: err.message });
   }
-};
+}
+
+const getOneCerereTip = async(req, res) =>{
+  try{
+    const cerere = await Cereri.findOne( {
+      where: {
+          id_cerere: req.params.id,
+      }
+  });
+
+    console.log("Cerere gasita: ", cerere);
+    res.json(cerere);
+  } catch(err) {
+    console.error('Eroare la getOneCerereTip:', err); 
+        res.status(500).json({ err: err.message });
+  }
+}
   
-module.exports = { uploadCerere, downloadCerere, getAllCereri };
+module.exports = { uploadCerere, downloadCerere, getAllCereri, getOneCerereTip };

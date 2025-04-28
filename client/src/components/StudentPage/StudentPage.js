@@ -1,39 +1,13 @@
 import './StudentPage.css';
-import { Link } from 'react-router-dom';
-import { useNavigate, useLocation } from 'react-router-dom';
-import  useAxiosPrivate  from '../../hooks/useAxiosPrivate';
+import SideBar from '../SideBar/SideBar';
 
 function StudentPage() {
 
-  const axiosPrivate = useAxiosPrivate();
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const logout =  async() => {
-        try {
-            await axiosPrivate.get('/logout', {
-                withCredentials: true,
-            });
-            console.log('Logout reușit');
-            navigate('/', {state: { from: location }, replace: true});
-        } catch (err) {
-            console.error('Eroare la logout: ', err);
-        }
-    }
 
   return (
     <div className="student-page">
       {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="logo">FormUp</div>
-        <nav className="nav-links">
-          <p><Link to='/home'>Home</Link></p>
-          <p><Link to='/cereri'>Cereri</Link></p>
-          <p><Link to='/adeverinte'>Adeverinte</Link></p>
-          <p><Link>Altceva</Link></p>
-        </nav>
-        <button className="sign-out" onClick={ () => logout() }>Sign Out</button>
-      </aside>
+      <SideBar />
 
       {/* Main Content */}
       <main className="main-content">
@@ -41,7 +15,6 @@ function StudentPage() {
         <header className="header">
           <h1>Welcome, Student!</h1>
           <div className="header-buttons">
-            <button className="icon-button" aria-label="Search">🔍</button>
             <button className="icon-button" aria-label="Notifications">🔔</button>
             <button className="icon-button avatar-button" aria-label="Profile">👤</button>
           </div>
