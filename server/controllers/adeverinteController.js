@@ -76,6 +76,25 @@ const adaugaSolicitare = async (req, res) => {
     }
 };
 
+const updateStatusAdeverinta = async (req, res) => {
+    try{
+        await Solicitari_Adeverinte.update(
+            {
+                status: "Procesare"
+            },
+            {
+                where: {
+                    id_adeverinta: req.params.id
+                }
+            }
+        );
+
+    } catch (err ){
+        console.error('Eroare la updateStatusAdeverinta:', err); 
+        res.status(500).json({ err: err.message });
+    }
+}
+
 const getOneAdeverinta = async(req, res) => {
     try{
         const adeverinta = await Solicitari_Adeverinte.findOne( {
@@ -162,4 +181,5 @@ const downloadAdeverintaSolicitata = async (req, res) => {
     }
 }
 
-module.exports = { adaugaSolicitare, getAllAdeverinte: getAllAdeverinte, getOneAdeverinta, uploadAdeverintaSolicitata, downloadAdeverintaSolicitata };
+module.exports = { adaugaSolicitare, getAllAdeverinte, getOneAdeverinta,
+     uploadAdeverintaSolicitata, downloadAdeverintaSolicitata, updateStatusAdeverinta };

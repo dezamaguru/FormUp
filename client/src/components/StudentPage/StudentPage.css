@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to  right, #c9e0f6, #ffffff);
+  background: linear-gradient(to right, #c9e0f6, #ffffff);
   min-height: 100vh;
 }
 
@@ -10,61 +10,15 @@ body {
   min-height: 100vh;
 }
 
-/* Sidebar */
-.sidebar {
-  width: 220px;
-  background: white;
-  padding: 2rem 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-radius: 30px; /* colțuri rotunde */
-  margin: 1rem; /* spațiu față de marginea paginii */
-  align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* opțional pentru profunzime */
-}
-
-
-.logo {
-  font-weight: bold;
-  font-size: 1.2rem;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.nav-links a {
-  display: block;
-  margin: 1rem 0;
-  text-decoration: none;
-  color: #1e293b;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
-}
-
-.nav-links a:hover {
-  background: #cbd5e1;
-}
-
-.sign-out {
-  background: #67a5f8;
-  color: white;
-  padding: 0.5rem;
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
-  width: 50%;
-}
-
 /* Main content */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* distribuie spațiul între header și dashboard */
+  justify-content: flex-start; /* ✅ înlocuiește space-between */
+  gap: 12rem; /* opțional: spațiu natural între header și conținut */
   padding: 2rem;
 }
-
 
 /* Header */
 .header {
@@ -105,7 +59,7 @@ body {
 /* Dashboard grid */
 .dashboard {
   display: grid;
-  grid-template-areas: 
+  grid-template-areas:
     "classes attendance news"
     "classes calendar  news";
   grid-template-columns: 2fr 1fr 1fr;

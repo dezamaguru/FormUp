@@ -1,0 +1,46 @@
+.section-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center; /* 🟢 centrează cardurile */
+  }
+  
+  .history-card {
+    width: 60%; /* 🔵 controlează lățimea cardurilor */
+    max-width: 600px;
+    background-color: #f1f5f9;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: center;
+  }
+  
+  
+  .history-card:hover {
+    background-color: #e2e8f0;
+  }
+  
+  .history-card strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .history-card p {
+    margin: 0.2rem 0;
+    color: #334155;
+  }
+  
+  .history-card small {
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+  

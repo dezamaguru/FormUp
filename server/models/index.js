@@ -44,4 +44,11 @@ db.Sequelize = Sequelize;
 db.Users.hasMany(db.Solicitari_Adeverinte, { foreignKey: 'userId' });
 db.Solicitari_Adeverinte.belongsTo(db.Users, { foreignKey: 'userId' });
 
+db.Users.hasMany(db.Solicitari_Cereri, { foreignKey: 'id_student' });
+db.Solicitari_Cereri.belongsTo(db.Users, { foreignKey: 'id_student' });
+
+db.Cereri.hasMany(db.Solicitari_Cereri, { foreignKey: 'id_cerere_tip' });
+db.Solicitari_Cereri.belongsTo(db.Cereri, { foreignKey: 'id_cerere_tip' });
+
+
 module.exports = db;

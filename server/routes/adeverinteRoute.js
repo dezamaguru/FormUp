@@ -10,5 +10,6 @@ router.get('/', verifyJWT, adeverinteController.getAllAdeverinte);
 router.get('/:id', verifyJWT, adeverinteController.getOneAdeverinta);
 router.post('/:id/upload', verifyJWT, upload.single('file'), adeverinteController.uploadAdeverintaSolicitata);
 router.get('/:id/download', verifyJWT, adeverinteController.downloadAdeverintaSolicitata); 
+router.post('/:id/status', verifyJWT, adeverinteController.updateStatusAdeverinta); 
 
 module.exports = router;
