@@ -2,7 +2,7 @@ body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(to right, #c9e0f6, #ffffff);
-  min-height: 100vh;
+  /* min-height: 100vh; */
 }
 
 .student-page {
@@ -60,8 +60,8 @@ body {
 .dashboard {
   display: grid;
   grid-template-areas:
-    "classes attendance news"
-    "classes calendar  news";
+    "classes classes news"
+    "classes classes  news";
   grid-template-columns: 2fr 1fr 1fr;
   gap: 1.5rem;
   margin-top: 2rem;

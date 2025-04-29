@@ -29,7 +29,7 @@ const getAllCereri = async (req, res) => {
         attributes: ["id_cerere", "title", "filename"],
       });
 
-      console.log("Cereri preluate:", cereri); 
+      //console.log("Cereri preluate:", cereri); 
       return res.json(cereri); 
     }
   } catch (err) {

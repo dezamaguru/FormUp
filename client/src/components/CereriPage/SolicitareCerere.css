@@ -1,0 +1,56 @@
+.dashboard-solicitare {
+    display: grid;
+    grid-template-areas:
+        "solicitare solicitare observatie"
+        "solicitare solicitare observatie";
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* Card style */
+.card-solicitare {
+    background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.card-cereri-observatie {
+    background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Cereri */
+.solicitare-card {
+    background: #ffffff;
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: background 0.3s ease;
+    text-align: center;
+}
+
+.solicitare-card strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.observatie-card {
+    background: #f1f5f9;
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: center;
+}
+
+.observatie-card:hover {
+    background-color: #e2e8f0;
+}

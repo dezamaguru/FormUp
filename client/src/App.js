@@ -10,6 +10,7 @@ import Cereri from './components/CereriPage/CereriPage';
 import Adevererinte from './components/AdeverintePage/AdeverintePage';
 import AdeverintaSolicitata from './components/AdeverintePage/AdeverintaSolicitata';
 import CerereTip from './components/CereriPage/CerereTip';
+import SolicitareCerere from './components/CereriPage/SolicitareCerere';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route path='/adeverinte' element={<Adevererinte/>} />
               <Route path='/adeverinte/:id' element={<AdeverintaSolicitata/>} />
               <Route path='/cereri/:id' element={<CerereTip/>}/>
+              <Route path="/cereri/solicitari/:id" element={<SolicitareCerere />} />
               
             </Route>
           </Route>"

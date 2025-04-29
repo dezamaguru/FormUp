@@ -44,4 +44,34 @@ const uploadSolicitareCerere = async(req, res) => {
     }
 }
 
-module.exports = { uploadSolicitareCerere }
+const getAllSolicitariCereri = async(req, res) => {
+    try{
+        const solicitari = await Solicitari_Cereri.findAll({
+            attributes: ["id_solicitare", "id_cerere", "userId", "status"]
+        });
+
+        console.log("Solicitari preluate: ", solicitari);
+        return res.json(solicitari);
+    } catch(err) {
+        console.log("Eroare la  getAllSolicitariCereri: ", err);
+        return res.status(500).json({message: "Eroare la getAllSolicitariCereri "});
+    }
+}
+
+const getOneSolicitare = async(req, res) => {
+    try{
+        const solicitare = await Solicitari_Cereri.findOne({
+            where:{
+                id_solicitare: req.params.id,
+            }
+        })
+        
+        console.log("Solicitare gasita: ", solicitare);
+        res.json(solicitare);
+    } catch(err){
+        console.log("Eroare la getOneSolicitare: ", err);
+        res.status(500).json({ err: err.message });
+    }
+}
+
+module.exports = { uploadSolicitareCerere, getAllSolicitariCereri, getOneSolicitare }
