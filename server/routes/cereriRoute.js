@@ -6,13 +6,17 @@ const solicitariCereriController = require('../controllers/solicitariCereriContr
 const multer = require('multer');
 const upload = multer();
 
-//cereri
+// // solicitari
+// router.get('/solicitari', verifyJWT, solicitariCereriController.getAllSolicitariCereri); // istoric solicitari
+// router.get('/solicitari/:id', verifyJWT, solicitariCereriController.getOneSolicitare); // detalii solicitare
+
+// cereri
 router.get('/', verifyJWT, cereriController.getAllCereri); // listare
 router.get('/:id/download', verifyJWT, cereriController.downloadCerere); // download
 router.post('/upload', verifyJWT, upload.single('file'), cereriController.uploadCerere); // upload
-router.get('/:id', verifyJWT, cereriController.getOneCerereTip); //cerere tip
+router.get('/:id', verifyJWT, cereriController.getOneCerereTip); // cerere tip
 
-//solicitari
-router.post('/:id/upload', verifyJWT, upload.single('file'), solicitariCereriController.uploadSolicitareCerere);
+router.post('/:id/upload',upload.single('file'), verifyJWT, solicitariCereriController.uploadSolicitareCerere);
+router.get('/solicitari/:id', verifyJWT, solicitariCereriController.getOneSolicitare);
 
-module.exports = router;
+module.exports = router;    

@@ -43,7 +43,7 @@ function StudentPage() {
           </section>
 
           {/* Attendance */}
-          <section className="card attendance" style={{ gridArea: "attendance" }}>
+          {/* <section className="card attendance" style={{ gridArea: "attendance" }}>
             <h3>Mark attendance</h3>
             <select>
               <option>Mathematics</option>
@@ -55,10 +55,10 @@ function StudentPage() {
               ))}
             </div>
             <button className="btn-primary">Present</button>
-          </section>
+          </section> */}
 
           {/* Calendar */}
-          <section className="card calendar" style={{ gridArea: "calendar" }}>
+          {/* <section className="card calendar" style={{ gridArea: "calendar" }}>
             <h3>My Calendar</h3>
             <p>March 2022</p>
             <div className="calendar-grid">
@@ -68,13 +68,12 @@ function StudentPage() {
                 </div>
               ))}
             </div>
-          </section>
+          </section> */}
 
           {/* News */}
           <section className="card news" style={{ gridArea: "news" }}>
             <h3>News & Updates</h3>
             <div className="news-box">
-              <img />
               <p>Universities to announce exams</p>
               <button className="read-more">Read more</button>
             </div>

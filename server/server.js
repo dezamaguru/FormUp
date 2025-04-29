@@ -23,6 +23,7 @@ app.use('/refresh', require('./routes/refreshRoute'));
 app.use('/users', require('./routes/usersRoute'));
 app.use('/logout', require('./routes/logoutRoute'));
 app.use('/cereri', require('./routes/cereriRoute'));
+app.use('/solicitari', require('./routes/solicitariRoute'));
 app.use('/adeverinte', require('./routes/adeverinteRoute'));
 
 db.sequelize.sync().then(() => {

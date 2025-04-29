@@ -1,3 +1,4 @@
+import './CereriPage.css';
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -6,6 +7,7 @@ import useAuth from "../../hooks/useAuth";
 
 function Cereri() {
   const [cereri, setCereri] = useState([]);
+  const [solicitari, setSolicitari] = useState([]);
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");
@@ -36,7 +38,28 @@ function Cereri() {
       }
     };
 
+    const getSolicitari = async () =>{
+      try{
+        const res = await axiosPrivate.get("/solicitari", {
+          signal: controller.signal,
+        });
+
+        if(isMounted) {
+          console.log("Solicitari primite:", res.data);
+          setSolicitari(res.data);
+        }
+      } catch(err) {
+        if (err.name === "CanceledError") {
+          console.log("Request canceled:", err.message);
+        } else {
+          console.error(err.res.data);
+          navigate("/", { state: { from: location }, replace: true });
+        }
+      }
+    }
+
     getCereri();
+    getSolicitari();
 
     return () => {
       isMounted = false;
@@ -68,6 +91,7 @@ function Cereri() {
       setTitle("");
       setType("");
       setFile(null);
+      navigate("/cereri", { state: { from: location }, replace: true });
     } catch (err) {
       console.error("Eroare completă:", err);
       console.error("Răspuns server:", err.response?.data);
@@ -94,24 +118,43 @@ function Cereri() {
           </div>
         </header>
 
-        <h2>Cereri disponibile pentru descărcare</h2>
-
         {auth?.type === "student" && (
 
-          <div className="dashboard"> 
-            <article>
+          <div className="dashboard-cereri" style={{gridArea: "cereri"}}> 
+            <section className="card-cereri">
               {Array.isArray(cereri) && cereri.length > 0 ? (
-                <ul>
-                  {cereri.map((cerere) => (
-                    <li key={cerere.id_cerere} onClick={() => navigate(`/cereri/${cerere.id_cerere}`)}>
-                      {cerere.title}
-                    </li>
-                  ))}
-                </ul>
+                  cereri.map((cerere) => (
+                      <div 
+                        key = {cerere.id_cerere}
+                        className="cerere-card"
+                        onClick={() => navigate(`/cereri/${cerere.id_cerere}`)}
+                      >
+                        <strong>{cerere.title}</strong>
+                        <p>{cerere.type}</p>
+                      </div>
+                  ))
               ) : (
                 <p>Nu există cereri disponibile.</p>
               )}
-            </article>
+            </section>
+
+            {/* Solicitari */}
+            <section className="card-cereri-istoric" style={{gridArea: "istoric"}}>
+              <strong>Istoric solicitari</strong>
+              {Array.isArray(solicitari) && solicitari.length > 0 ? (
+                solicitari.map((solicitare) => (
+                  <div
+                    key={solicitare.id_solicitare} 
+                    className='istoric-card'
+                    onClick={() => navigate(`/cereri/solicitari/${solicitare.id_solicitare}`)}>
+                    <strong>Solicitare: {solicitare.id_solicitare}</strong>
+                    <p>Status: {solicitare.status}</p>
+                  </div>
+                ))
+              ) : (
+                <p>Nu exista solicitari</p>
+              )}
+            </section>
           </div>
         )}
 
