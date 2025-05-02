@@ -52,8 +52,8 @@ function AdeverintePage() {
     navigate(`/adeverinte/${id}`); // navigheaza catre adeverinta solicitata
 
     if (currentStatus === "Procesare" || currentStatus === "Aprobata") {
-        console.log("Statusul nu poate fi schimbat deoarece este deja:", currentStatus);
-        return; // Nu face nimic dacă statusul este deja "Procesare" sau "Aprobata"
+      console.log("Statusul nu poate fi schimbat deoarece este deja:", currentStatus);
+      return; // Nu face nimic dacă statusul este deja "Procesare" sau "Aprobata"
     }
 
     try {
@@ -81,7 +81,7 @@ function AdeverintePage() {
             </button>
           </div>
         </header>
-        
+
         {auth?.type === "student" && (
           <div>
             <button className="submit-btn" onClick={() => setShowDropDown((prev) => !prev)}>
@@ -112,24 +112,24 @@ function AdeverintePage() {
 
         {auth?.type === "secretar" && (
           <div>
-            <p>Aici sunt adeverintele</p>
-            <br />
-            <br />
+            <p className="section-title">Solicitari adeverinte</p>
 
-            {Array.isArray(adeverinte) && adeverinte.length > 0 ? (
-              <ul>
-                {adeverinte.map((adeverinta) => (
-                  <li
-                    key={adeverinta.id_adeverinta}
-                    onClick={() => handleClick(adeverinta.id_adeverinta, adeverinta.status)}
-                  >
-                    Solicitare adeverinta {adeverinta.tip_adeverinta} - {adeverinta.nume_student} - {adeverinta.status}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>Nu exista solicitari pentru adeverinte.</p>
-            )}
+            <div className="history-list">
+              {Array.isArray(adeverinte) && adeverinte.length > 0 ? (adeverinte.map((adeverinta) => (
+                <div
+                  key={adeverinta.id_adeverinta}
+                  className="history-card"
+                  onClick={() => handleClick(adeverinta.id_adeverinta, adeverinta.status)}
+                >
+                  <strong>{adeverinta.tip_adeverinta}</strong>
+                  <p>{adeverinta.nume_student}</p>
+                  <small>{adeverinta.status}</small>
+                </div>
+              ))
+              ) : (
+                <p>Nu exista solicitari pentru adeverinte.</p>
+              )}
+            </div>
           </div>
         )}
       </main>

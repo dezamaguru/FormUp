@@ -47,8 +47,10 @@ db.Solicitari_Adeverinte.belongsTo(db.Users, { foreignKey: 'userId' });
 db.Users.hasMany(db.Solicitari_Cereri, { foreignKey: 'userId' });
 db.Solicitari_Cereri.belongsTo(db.Users, { foreignKey: 'userId' });
 
-db.Cereri.hasMany(db.Solicitari_Cereri, { foreignKey: 'id_cerere_tip' });
-db.Solicitari_Cereri.belongsTo(db.Cereri, { foreignKey: 'id_cerere_tip' });
+db.Cereri.hasMany(db.Solicitari_Cereri, { foreignKey: 'id_cerere' });
+db.Solicitari_Cereri.belongsTo(db.Cereri, { foreignKey: 'id_cerere' });
 
+db.Solicitari_Cereri.hasMany(db.Observatii_Cereri, {foreignKey: 'id_solicitare'})
+db.Observatii_Cereri.belongsTo(db.Solicitari_Cereri, {foreignKey: 'id_solicitare'})
 
 module.exports = db;

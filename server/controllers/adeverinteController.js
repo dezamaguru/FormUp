@@ -47,9 +47,6 @@ const adaugaSolicitare = async (req, res) => {
     try { 
         const { name, tipAdeverinta } = req.body;
 
-        //console.log('Date primite:', req.body);
-        //console.log('ID student:', req.userId); // Pentru debugging
-
         if (!name || !tipAdeverinta) {
             return res.status(400).json({ 
                 message: "Numele și tipul adeverinței sunt obligatorii!" 

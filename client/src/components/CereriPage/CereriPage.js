@@ -38,17 +38,17 @@ function Cereri() {
       }
     };
 
-    const getSolicitari = async () =>{
-      try{
+    const getSolicitari = async () => {
+      try {
         const res = await axiosPrivate.get("/solicitari", {
           signal: controller.signal,
         });
 
-        if(isMounted) {
+        if (isMounted) {
           console.log("Solicitari primite:", res.data);
           setSolicitari(res.data);
         }
-      } catch(err) {
+      } catch (err) {
         if (err.name === "CanceledError") {
           console.log("Request canceled:", err.message);
         } else {
@@ -120,31 +120,31 @@ function Cereri() {
 
         {auth?.type === "student" && (
 
-          <div className="dashboard-cereri" style={{gridArea: "cereri"}}> 
+          <div className="dashboard-cereri" style={{ gridArea: "cereri" }}>
             <section className="card-cereri">
               {Array.isArray(cereri) && cereri.length > 0 ? (
-                  cereri.map((cerere) => (
-                      <div 
-                        key = {cerere.id_cerere}
-                        className="cerere-card"
-                        onClick={() => navigate(`/cereri/${cerere.id_cerere}`)}
-                      >
-                        <strong>{cerere.title}</strong>
-                        <p>{cerere.type}</p>
-                      </div>
-                  ))
+                cereri.map((cerere) => (
+                  <div
+                    key={cerere.id_cerere}
+                    className="cerere-card"
+                    onClick={() => navigate(`/cereri/${cerere.id_cerere}`)}
+                  >
+                    <strong>{cerere.title}</strong>
+                    <p>{cerere.type}</p>
+                  </div>
+                ))
               ) : (
                 <p>Nu există cereri disponibile.</p>
               )}
             </section>
 
             {/* Solicitari */}
-            <section className="card-cereri-istoric" style={{gridArea: "istoric"}}>
+            <section className="card-cereri-istoric" style={{ gridArea: "istoric" }}>
               <strong>Istoric solicitari</strong>
               {Array.isArray(solicitari) && solicitari.length > 0 ? (
                 solicitari.map((solicitare) => (
                   <div
-                    key={solicitare.id_solicitare} 
+                    key={solicitare.id_solicitare}
                     className='istoric-card'
                     onClick={() => navigate(`/cereri/solicitari/${solicitare.id_solicitare}`)}>
                     <strong>Solicitare: {solicitare.id_solicitare}</strong>
@@ -159,51 +159,73 @@ function Cereri() {
         )}
 
         {auth?.type === "secretar" && (
-          <div>
-            <form onSubmit={handleUpload} style={{ marginBottom: "20px" }}>
-              <input
-                type="text"
-                placeholder="Titlu cerere"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
+          <div className="dashboard-cereri" style={{ gridArea: "cereri" }}>
+            <section className="card-cereri-istoric" style={{ gridArea: "istoric" }}>
+              <strong>Solicitari </strong>
+              {Array.isArray(solicitari) && solicitari.length > 0 ? (
+                solicitari.map((solicitare) => (
+                  <div
+                    key={solicitare.id_solicitare}
+                    className='istoric-card'
+                    onClick={() => navigate(`/cereri/solicitari/${solicitare.id_solicitare}`)}>
+                    <strong>Solicitare: {solicitare.id_solicitare}</strong>
+                    <p>Status: {solicitare.status}</p>
+                  </div>
+                ))
+              ) : (
+                <p>Nu exista solicitari</p>
+              )}
+            </section>
 
-              <select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                required
-              >
-                <option value="" disabled hidden>
-                  Alege tipul cererii
-                </option>
-                <option value="licenta">Licenta</option>
-                <option value="master">Master</option>
-                <option value="comun">Comun</option>
-                <option value="altele">Altele</option>
-              </select>
+            <section className="card-cereri">
+              <div className="card-upload-cerere">
+                <form onSubmit={handleUpload} style={{ marginBottom: "20px" }}>
+                  <input
+                    type="text"
+                    placeholder="Titlu cerere"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                  />
 
-              <input
-                type="file"
-                onChange={(e) => setFile(e.target.files[0])}
-                required
-              />
-              <button type="submit"> Încarcă cerere </button>
-            </form>
+                  <select
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
+                    required
+                  >
+                    <option value="" disabled hidden>
+                      Alege tipul cererii
+                    </option>
+                    <option value="licenta">Licenta</option>
+                    <option value="master">Master</option>
+                    <option value="comun">Comun</option>
+                    <option value="altele">Altele</option>
+                  </select>
 
-            <article>
+                  <input
+                    type="file"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    required
+                  />
+                  <button type="submit"> Încarcă cerere </button>
+                </form>
+              </div>
+
               {Array.isArray(cereri) && cereri.length > 0 ? (
-                <ul>
-                  {cereri.map((cerere) => (
-                    <li key={cerere.id_cerere}>
-                      {cerere.title}
-                    </li>
-                  ))}
-                </ul>
+                cereri.map((cerere) => (
+                  <div
+                    key={cerere.id_cerere}
+                    className="cerere-card"
+                    onClick={() => navigate(`/cereri/${cerere.id_cerere}`)}
+                  >
+                    <strong>{cerere.title}</strong>
+                    <p>{cerere.type}</p>
+                  </div>
+                ))
               ) : (
                 <p>Nu există cereri disponibile.</p>
               )}
-            </article>
+            </section>
           </div>
         )}
       </main>

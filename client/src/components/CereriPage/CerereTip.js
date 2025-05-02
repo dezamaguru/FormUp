@@ -84,7 +84,6 @@ function CerereTip() {
         formData.append("file", file);
 
         try {
-            //console.log("Încărcare solicitare pentru cererea:", id);
             const res = await axiosPrivate.post(`/cereri/${id}/upload`,
                 formData,
                 {
