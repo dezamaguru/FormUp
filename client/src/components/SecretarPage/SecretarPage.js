@@ -1,5 +1,4 @@
 import './SecretarPage.css';
-import { Link } from "react-router-dom";
 import SideBar from "../SideBar/SideBar";
 
 function SecretarRole() {
@@ -41,34 +40,6 @@ function SecretarRole() {
               <small>5/2/22</small>
             </div>
           </section>
-
-          {/* Attendance */}
-          {/* <section className="card attendance" style={{ gridArea: "attendance" }}>
-            <h3>Mark attendance</h3>
-            <select>
-              <option>Mathematics</option>
-            </select>
-            <input type="time" defaultValue="09:00" />
-            <div className="pager">
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button key={n}>{n}</button>
-              ))}
-            </div>
-            <button className="btn-primary">Present</button>
-          </section> */}
-
-          {/* Calendar */}
-          {/* <section className="card calendar" style={{ gridArea: "calendar" }}>
-            <h3>My Calendar</h3>
-            <p>March 2022</p>
-            <div className="calendar-grid">
-              {Array.from({ length: 30 }).map((_, i) => (
-                <div key={i} className={i === 14 ? 'active' : ''}>
-                  {i + 1}
-                </div>
-              ))}
-            </div>
-          </section> */}
 
           {/* News */}
           <section className="card news" style={{ gridArea: "news" }}>

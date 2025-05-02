@@ -46,11 +46,14 @@
     padding: 1rem;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    cursor: pointer;
-    transition: background 0.3s ease;
     text-align: center;
 }
 
-.observatie-card:hover {
-    background-color: #e2e8f0;
+.container-form-observatii{
+    background: #f1f5f9;
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    text-align: center;
 }

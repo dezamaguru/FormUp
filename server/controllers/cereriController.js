@@ -44,9 +44,9 @@ const uploadCerere = async (req, res) => {
     const { type } = req.body;
     const file = req.file;
 
-    console.log('Titlu:', title); // Depanare
-    console.log('Fișier:', file); // Depanare
-    console.log('Type:', type); // Depanare
+    // console.log('Titlu:', title); // Depanare
+    // console.log('Fișier:', file); // Depanare
+    // console.log('Type:', type); // Depanare
 
     if (!file) {
       return res.status(400)
