@@ -2,7 +2,7 @@ const { Users } = require('../models');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const handleLogout = async (req, res) => {
+const handleLogout = async (req, res) => {  
     // On client, also delete the acces token 
     const cookies = req.cookies;
     if(!cookies?.jwt) {

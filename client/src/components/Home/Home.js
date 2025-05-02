@@ -1,6 +1,4 @@
 import React from "react";
-import { useContext } from "react";
-import AuthContext from "../../context/AuthProvider";
 import useAuth from "../../hooks/useAuth";
 import StudentPage from "../StudentPage/StudentPage";
 import SecretarPage from "../SecretarPage/SecretarPage";
