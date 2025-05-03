@@ -21,4 +21,5 @@ router.post('/:id/upload',upload.single('file'), verifyJWT, solicitariCereriCont
 router.get('/solicitari/:id', verifyJWT, solicitariCereriController.getOneSolicitare);
 router.post('/solicitari/:id/upload', verifyJWT, observatiiController.uploadObservatie);
 router.get('/solicitari/:id/observatii', verifyJWT, observatiiController.getAllObservatii);
+router.post('/solicitari/:id/status', verifyJWT, solicitariCereriController.updateStatusSolicitare);
 module.exports = router;    

@@ -1,0 +1,9 @@
+.dashboard-inbox {
+    display: grid;
+    grid-template-areas:
+        "solicitare solicitare observatie"
+        "solicitare solicitare observatie";
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}

@@ -13,6 +13,7 @@ function SolicitareCerere() {
     const location = useLocation();
     const { auth } = useAuth();
     const { id } = useParams();
+    const [statusSolicitare, setStatusAdeverinta] = useState("");
 
     const [title, setTitle] = useState("");
     const [continut, setContinut] = useState("");
@@ -67,7 +68,7 @@ function SolicitareCerere() {
             isMounted = false;
             controller.abort();
         };
-    }, [axiosPrivate, navigate, location]);
+    }, [axiosPrivate]);
 
 
     const handleUpload = async (e) => {
@@ -90,6 +91,29 @@ function SolicitareCerere() {
             console.error("Eroare completă:", err);
             console.error("Răspuns server:", err.response?.data);
             alert(err.response?.data?.message || "Eroare la upload");
+        }
+    }
+
+    const handleStatusChange = async (id, e) => {
+        e.preventDefault();
+
+        try {
+
+            const res = await axiosPrivate.post(`/cereri/solicitari/${id}/status`, {
+                statusSolicitare
+            });
+            setStatusAdeverinta("");
+            console.log("Status-ul solicitarii a fost actualzizat: ", res.data);
+        } catch (err) {
+            console.log("Eroare la actualizarea statusului solicitarii: ", err);
+        }
+    }
+
+    const handleModificaObservatie =() => {
+        try{
+
+        } catch(err) {
+            
         }
     }
 
@@ -132,19 +156,19 @@ function SolicitareCerere() {
                         <section className="card-cereri-observatie" style={{ gridArea: "observatie" }}>
                             <strong>Observatii</strong>
                             <div>
-                            {Array.isArray(observatii) && observatii.length > 0 ? (
-                                observatii.map((observatie) => (
-                                    <div
-                                        key={observatie.id_observatie}
-                                        className='observatie-card'>
+                                {Array.isArray(observatii) && observatii.length > 0 ? (
+                                    observatii.map((observatie) => (
+                                        <div
+                                            key={observatie.id_observatie}
+                                            className='observatie-card'>
 
-                                        <strong>{observatie.titlu}</strong>
-                                        <p>{observatie.continut}</p>
-                                    </div>
-                                ))
-                            ) : (
-                                <p>Nu exista observatii</p>
-                            )}
+                                            <strong>{observatie.titlu}</strong>
+                                            <p>{observatie.continut}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>Nu exista observatii</p>
+                                )}
                             </div>
                         </section>
                     </div>
@@ -160,6 +184,18 @@ function SolicitareCerere() {
                                     <p>ID Cerere: {solicitare.id_cerere}</p>
                                     <p>ID Utilizator: {solicitare.userId}</p>
                                     <p>Status: {solicitare.status}</p>
+                                    <form onSubmit={(e) => handleStatusChange(solicitare.id_solicitare,e)}>
+                                        <select
+                                            value={statusSolicitare}
+                                            onChange={(e) => setStatusAdeverinta(e.target.value)}
+                                        >
+                                            <option value="" disabled hidden>Schimba status</option>
+                                            <option value="Procesare">Procesare</option>
+                                            <option value="Aprobata">Aprobata</option>
+                                            <option value="Respinsa">Respinsa</option>
+                                        </select>
+                                        <button type='submit'>Update status</button>
+                                    </form>
                                 </div>
                             ) : (
                                 <p>Nu exista detalii pentru acesta solicitare</p>
@@ -190,21 +226,21 @@ function SolicitareCerere() {
                                 </form>
                             </div>
 
-                            <div> 
-                            {Array.isArray(observatii) && observatii.length > 0 ? (
-                                observatii.map((observatie) => (
-                                    <div
-                                        key={observatie.id_observatie}
-                                        className='observatie-card'>
+                            <div>
+                                {Array.isArray(observatii) && observatii.length > 0 ? (
+                                    observatii.map((observatie) => (
+                                        <div
+                                            key={observatie.id_observatie}
+                                            className='observatie-card'>
 
-                                        <strong>{observatie.titlu}</strong>
-                                        <p>{observatie.continut}</p>
-                                        <button>Modifica</button>
-                                    </div>
-                                ))
-                            ) : (
-                                <p>Nu exista observatii</p>
-                            )}
+                                            <strong>{observatie.titlu}</strong>
+                                            <p>{observatie.continut}</p>
+                                            <button onClick={() => handleModificaObservatie}>Modifica</button>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>Nu exista observatii</p>
+                                )}
                             </div>
                         </section>
                     </div>

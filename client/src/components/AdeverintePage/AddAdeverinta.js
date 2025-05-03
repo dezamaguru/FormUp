@@ -45,9 +45,20 @@ const AddAdeverinta = ({ onAdd }) => {
             className="form-select"
           >
             <option value="" disabled hidden>Alege tipul adeverinței</option>
-            <option value="adeverinta1">Adeverință 1</option>
-            <option value="adeverinta2">Adeverință 2</option>
-            <option value="adeverinta3">Adeverință 3</option>
+            <option value="adeverinta1">Agenția Județeană Pentru Inspecția Socială</option>
+            <option value="adeverinta2">Casa de Pensii</option>
+            <option value="adeverinta3">CNAS</option>
+            <option value="adeverinta3">D.G.A.S.P.C.</option>
+            <option value="adeverinta3">Locul de muncă</option>
+            <option value="adeverinta3">Locul de muncă al părintelui</option>
+            <option value="adeverinta3">Medicul de familie</option>
+            <option value="adeverinta3">Practică</option>
+            <option value="adeverinta3">Primărie</option>
+            <option value="adeverinta3">Servicul de cazare studenți - Direcția Socială</option>
+            <option value="adeverinta3">Spital</option>
+            <option value="adeverinta3">Transport</option>
+            <option value="adeverinta3">Tribunal</option>
+            <option value="adeverinta3">Work and Travel</option>
           </select>
         </div>
 

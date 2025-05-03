@@ -53,7 +53,7 @@ function AdeverintePage() {
 
     if (currentStatus === "Procesare" || currentStatus === "Aprobata") {
       console.log("Statusul nu poate fi schimbat deoarece este deja:", currentStatus);
-      return; // Nu face nimic dacă statusul este deja "Procesare" sau "Aprobata"
+      return; 
     }
 
     try {
