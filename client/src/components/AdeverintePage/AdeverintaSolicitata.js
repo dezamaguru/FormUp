@@ -11,15 +11,16 @@ const AdeverintaSolicitata = () => {
   const { auth } = useAuth();
   const [file, setFile] = useState(null);
 
+  const getOneAdeverinta = async () => {
+    try {
+      const res = await axiosPrivate.get(`/adeverinte/${id}`);
+      setAdeverinta(res.data);
+    } catch (err) {
+      console.error("Eroare la preluarea adeverintei:", err);
+    }
+  };
+
   useEffect(() => {
-    const getOneAdeverinta = async () => {
-      try {
-        const res = await axiosPrivate.get(`/adeverinte/${id}`);
-        setAdeverinta(res.data);
-      } catch (err) {
-        console.error("Eroare la preluarea adeverintei:", err);
-      }
-    };
 
     getOneAdeverinta();
   }, [id, axiosPrivate]);
@@ -42,7 +43,8 @@ const AdeverintaSolicitata = () => {
       );
       setFile(null);
       console.log("Fisierul incarcat:", res.data);
-      alert("Fisier incarcat cu succes");
+      getOneAdeverinta();
+      //alert("Fisier incarcat cu succes");
     } catch (err) {
       console.error("Eroare completă:", err);
       console.error("Răspuns server:", err.response?.data);

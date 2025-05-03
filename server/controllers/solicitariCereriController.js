@@ -74,4 +74,25 @@ const getOneSolicitare = async(req, res) => {
     }
 }
 
-module.exports = { uploadSolicitareCerere, getAllSolicitariCereri, getOneSolicitare }
+const updateStatusSolicitare = async (req, res) => {
+    const { statusSolicitare } = req.body; 
+    try{
+        await Solicitari_Cereri.update(
+            {
+                status: statusSolicitare,
+            },
+            {
+                where: {
+                    id_solicitare: req.params.id,
+                }
+            }
+        );
+        console.log("Status solictare modificat cu succes!")
+  
+    } catch (err ){
+        console.error('Eroare la updateStatusAdeverinta:', err); 
+        res.status(500).json({ err: err.message });
+    }
+  }
+
+module.exports = { uploadSolicitareCerere, getAllSolicitariCereri, getOneSolicitare, updateStatusSolicitare }
