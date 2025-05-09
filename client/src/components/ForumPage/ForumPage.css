@@ -1,9 +1,75 @@
-.dashboard-inbox {
-    display: grid;
-    grid-template-areas:
-        "solicitare solicitare observatie"
-        "solicitare solicitare observatie";
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 1.5rem;
-    margin-top: 2rem;
+.forum-layout {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.conversations-list {
+  flex: 1;
+  max-width: 300px;
+  padding: 1rem;
+}
+
+.conversations-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.conversations-list li {
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: #f1f5f9;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.conversations-list li:hover {
+  background: #e2e8f0;
+}
+
+.conversation-window {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.messages-box {
+  flex-grow: 1;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.message {
+  background: #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+}
+
+.message.student {
+  background: #dbeafe;
+  align-self: flex-start;
+}
+
+.message.secretar {
+  background: #cbd5e1;
+  align-self: flex-end;
+}
+
+.send-box {
+  display: flex;
+  gap: 1rem;
+}
+
+.send-box input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+}
+
+.send-box button {
+  padding: 0.5rem 1rem;
 }
