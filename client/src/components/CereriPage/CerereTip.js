@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { useNavigate } from "react-router-dom";
 
 function CerereTip() {
     const { id } = useParams();
@@ -11,6 +12,10 @@ function CerereTip() {
     const axiosPrivate = useAxiosPrivate();
     const { auth } = useAuth();
     const [file, setFile] = useState(null);
+    const [showDropDown, setShowDropDown] = useState(false);
+    const [title, setTitle] = useState("");
+    const [type, setType] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         const getOneCerere = async () => {
@@ -104,6 +109,46 @@ function CerereTip() {
         }
     }
 
+    const handleModificaCerere = async () => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("title", title);
+        formData.append("type", type);
+
+        try {
+
+            const res = await axiosPrivate.post(`/cereri/${id}/modify`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            setFile(null);
+            console.log("Solicitare adăugată cu succes!", res.data);
+            alert("Fișier încărcat cu succes");
+
+        } catch (err) {
+            console.error("Eroare completă:", err);
+            console.error("Răspuns server:", err.response?.data);
+            alert(err.response?.data?.message || "Eroare la încărcare");
+        }
+    }
+
+    const handleDeleteCerereTip = async (id_cerere) => {
+        navigate('/cereri');
+        try {
+            await axiosPrivate.post(`cereri/${id}/delete`, {
+                id_cerere
+            });
+            console.log("Cerere tip stearsa");
+        } catch (err) {
+            console.error("Eroare completă:", err);
+            console.error("Răspuns server:", err.response?.data);
+        }
+    }
+
     return (
         <div className="student-page">
             <SideBar />
@@ -151,23 +196,73 @@ function CerereTip() {
                     <div>
                         {cerereTip ? (
                             <>
-                                <p>Detalii cerere</p>
-                                <p>Nume: {cerereTip.title}</p>
-                                <p>Tip: {cerereTip.type}</p>
-                                <button onClick={() => handleDownload(cerereTip.id_cerere)}>
-                                    Descarcă
-                                </button>
+                                {
+                                    showDropDown ? (
+                                        <div>
+                                            <form onSubmit={() => handleModificaCerere()} style={{ marginBottom: "20px" }}>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Titlu cerere"
+                                                    value={title}
+                                                    onChange={(e) => setTitle(e.target.value)}
+                                                    required
+                                                />
 
-                                <button>Modifica cerere</button>
+                                                <select
+                                                    value={type}
+                                                    onChange={(e) => setType(e.target.value)}
+                                                    required
+                                                >
+                                                    <option value="" disabled hidden>
+                                                        Alege tipul cererii
+                                                    </option>
+                                                    <option value="licenta">Licenta</option>
+                                                    <option value="master">Master</option>
+                                                    <option value="comun">Comun</option>
+                                                    <option value="altele">Altele</option>
+                                                </select>
+
+                                                <input
+                                                    type="file"
+                                                    onChange={(e) => setFile(e.target.files[0])}
+                                                    required
+                                                />
+                                                <button type="submit"> Salveaza modificari </button>
+                                                <button onClick={() => setShowDropDown((prev) => !prev)}>Anuleaza</button>
+                                            </form>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <p>Detalii cerere</p>
+                                            <p>Nume: {cerereTip.title}</p>
+                                            <p>Tip: {cerereTip.type}</p>
+                                            <button onClick={() => handleDownload(cerereTip.id_cerere)}>
+                                                Descarcă
+                                            </button>
+
+                                            <button onClick={() => {
+                                                setShowDropDown((prev) => !prev)
+                                                setTitle(cerereTip.title)
+                                                setType(cerereTip.type)
+                                            }
+                                            }
+                                            >Modifica cerere</button>
+
+                                            <button
+                                                onClick={() => handleDeleteCerereTip(cerereTip.id_cerere)}
+                                            >Sterge</button>
+                                        </>
+                                    )}
                             </>
                         ) : (
                             <p>Nu exista detalii pentru aceasta cerere.</p>
                         )
                         }
                     </div>
-                )}
-            </main>
-        </div>
+                )
+                }
+            </main >
+        </div >
     );
 }
 

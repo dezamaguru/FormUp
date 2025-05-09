@@ -18,7 +18,12 @@ function SolicitareCerere() {
     const [title, setTitle] = useState("");
     const [continut, setContinut] = useState("");
 
+    const [titleModificat, setTitleModificat] = useState("");
+    const [continutModificat, setContinutModificat] = useState("");
+
     const [observatii, setObservatii] = useState([]);
+
+    const [selectedObservatieId, setSelectedObservatieId] = useState(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -94,8 +99,7 @@ function SolicitareCerere() {
         }
     }
 
-    const handleStatusChange = async (id, e) => {
-        e.preventDefault();
+    const handleStatusChange = async (id) => {
 
         try {
 
@@ -109,11 +113,31 @@ function SolicitareCerere() {
         }
     }
 
-    const handleModificaObservatie =() => {
-        try{
+    const handleModificaObservatie = async (id_observatie) => {
 
+        try {
+            const res = await axiosPrivate.post(`/cereri/solicitari/${id}/modify`, {
+                titleModificat,
+                continutModificat,
+                id_observatie: id_observatie
+            });
+
+            setTitle("");
+            setContinut("");
+            console.log("Obsservatia a fost modificata cu succes!", res.data);
+        } catch (err) {
+            console.log("Eroare la modificarea obseravtiei", err);
+        }
+    }
+
+    const handleDeleteObservatie = async(id_observatie) => {
+        try{
+            const res = await axiosPrivate.post(`/cereri/solicitari/${id}/delete`, {
+                id_observatie: id_observatie
+            })
+            console.log("Observatie stearsa", res.data);
         } catch(err) {
-            
+            console.log("Eroare la stergere obseravtie");
         }
     }
 
@@ -138,7 +162,7 @@ function SolicitareCerere() {
 
                 {auth?.type === "student" && (
                     <div className="dashboard-solicitare" style={{ gridArea: "solicitare" }}>
-                        <section className="ccard-solicitare">
+                        <section className="card-solicitare">
                             {solicitare ? (
                                 <div className="solicitare-card">
                                     <p>Detalii solicitare</p>
@@ -184,7 +208,7 @@ function SolicitareCerere() {
                                     <p>ID Cerere: {solicitare.id_cerere}</p>
                                     <p>ID Utilizator: {solicitare.userId}</p>
                                     <p>Status: {solicitare.status}</p>
-                                    <form onSubmit={(e) => handleStatusChange(solicitare.id_solicitare,e)}>
+                                    <form onSubmit={() => handleStatusChange(solicitare.id_solicitare)}>
                                         <select
                                             value={statusSolicitare}
                                             onChange={(e) => setStatusAdeverinta(e.target.value)}
@@ -232,10 +256,43 @@ function SolicitareCerere() {
                                         <div
                                             key={observatie.id_observatie}
                                             className='observatie-card'>
+                                            {selectedObservatieId === observatie.id_observatie ? (
+                                                <div>
+                                                    <form onSubmit={() => handleModificaObservatie(observatie.id_observatie)} style={{ marginBottom: "20px" }}>
+                                                        <input
+                                                            type='text'
+                                                            placeholder='Titlu observatie'
+                                                            value={titleModificat}
+                                                            onChange={(e) => setTitleModificat(e.target.value)}
+                                                            required
+                                                        />
 
-                                            <strong>{observatie.titlu}</strong>
-                                            <p>{observatie.continut}</p>
-                                            <button onClick={() => handleModificaObservatie}>Modifica</button>
+                                                        <input
+                                                            type='text'
+                                                            placeholder='Continut text...'
+                                                            value={continutModificat}
+                                                            onChange={(e) => setContinutModificat(e.target.value)}
+                                                        />
+
+                                                        <button type='submit' >Salveaza</button>
+                                                        <button
+                                                            onClick={() => setSelectedObservatieId(null)}>Anuleaza</button>
+                                                    </form>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <strong>{observatie.titlu}</strong>
+                                                    <p>{observatie.continut}</p>
+                                                    <button onClick={() => {
+                                                        setSelectedObservatieId(observatie.id_observatie);
+                                                        setTitleModificat(observatie.titlu);
+                                                        setContinutModificat(observatie.continut);
+                                                    }}>Modifica</button>
+                                                    <button
+                                                    onClick={()=> handleDeleteObservatie(observatie.id_observatie)}
+                                                    >Sterge</button>
+                                                </>
+                                            )}
                                         </div>
                                     ))
                                 ) : (

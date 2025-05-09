@@ -25,6 +25,7 @@ app.use('/logout', require('./routes/logoutRoute'));
 app.use('/cereri', require('./routes/cereriRoute'));
 app.use('/solicitari', require('./routes/solicitariRoute'));
 app.use('/adeverinte', require('./routes/adeverinteRoute'));
+app.use('/inbox', require('./routes/conversatiiRoute'));
 
 db.sequelize.sync().then(() => {    
     app.listen(3500, () => {

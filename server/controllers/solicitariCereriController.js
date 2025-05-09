@@ -46,12 +46,41 @@ const uploadSolicitareCerere = async(req, res) => {
 
 const getAllSolicitariCereri = async(req, res) => {
     try{
-        const solicitari = await Solicitari_Cereri.findAll({
-            attributes: ["id_solicitare", "id_cerere", "userId", "status"]
-        });
+        if(req.type === 'student') {
+            const solicitari = await Solicitari_Cereri.findAll({
+                attributes: ["id_solicitare", "id_cerere", "userId", "status"],
+                where: {
+                    userId: req.userId,
+                }
+            });
 
-        console.log("Solicitari preluate: ", solicitari);
-        return res.json(solicitari);
+            console.log("Solicitari preluate: ", solicitari);
+            return res.json(solicitari);
+        }
+
+        if(req.type === 'secretar') {
+            const secretar = await Users.findByPk(req.userId);
+            if(!secretar) {
+                return res.status(404).json({message: "Profilul secretarului nu a fost gasit"});
+            }
+
+            const solicitari = await Solicitari_Cereri.findAll( {
+                attributes: ["id_solicitare", "id_cerere", "userId", "status"],
+                include: {
+                    model: Users,
+                    attributes: ['program_studiu', 'an_studiu'],
+                    where: {
+                        program_studiu: secretar.program_studiu,
+                        an_studiu: secretar.an_studiu,
+                        type: 'student'
+                    }
+                }
+            });
+
+            console.log("Solicitari preluate: ", solicitari);
+            return res.json(solicitari);
+        }
+
     } catch(err) {
         console.log("Eroare la  getAllSolicitariCereri: ", err);
         return res.status(500).json({message: "Eroare la getAllSolicitariCereri "});

@@ -15,13 +15,13 @@ const getAllCereri = async (req, res) => {
         attributes: ["id_cerere", "title", "filename"],
         where: {
           type: {
-            [Sequelize.Op.in]: [program_studiu, "comun", "altele"], 
+            [Sequelize.Op.in]: [program_studiu, "comun", "altele"],
           },
         },
       });
 
-      console.log("Cereri preluate:", cereri); 
-      return res.json(cereri); 
+      console.log("Cereri preluate:", cereri);
+      return res.json(cereri);
     }
 
     if (user.type === "secretar") {
@@ -30,10 +30,10 @@ const getAllCereri = async (req, res) => {
       });
 
       //console.log("Cereri preluate:", cereri); 
-      return res.json(cereri); 
+      return res.json(cereri);
     }
   } catch (err) {
-    console.error("Eroare la getAllCereri:", err); 
+    console.error("Eroare la getAllCereri:", err);
     return res.status(500).json({ err: err.message });
   }
 };
@@ -50,17 +50,17 @@ const uploadCerere = async (req, res) => {
 
     if (!file) {
       return res.status(400)
-      .json({ message: "Fisierul nu a fost incarcat!" });
+        .json({ message: "Fisierul nu a fost incarcat!" });
     }
 
     if (!title) {
       return res.status(400)
-      .json({ message: "Titlul nu a fost completat!" });
+        .json({ message: "Titlul nu a fost completat!" });
     }
 
     if (!type) {
       return res.status(400)
-      .json({ message: "Nu s-a ales tipul cererii!" });
+        .json({ message: "Nu s-a ales tipul cererii!" });
     }
 
     // Creăm cererea și salvăm rezultatul
@@ -91,10 +91,10 @@ const uploadCerere = async (req, res) => {
 const downloadCerere = async (req, res) => {
   try {
 
-    const cerere = await Cereri.findOne( {
+    const cerere = await Cereri.findOne({
       attributes: ['filename', 'mime_type', 'file_data'],
       where: {
-          id_cerere: req.params.id,
+        id_cerere: req.params.id,
       }
     });
 
@@ -110,7 +110,7 @@ const downloadCerere = async (req, res) => {
     res.setHeader('Content-Type', cerere.mime_type || 'application/octet-stream');
     res.setHeader('Content-Disposition', `attachment; filename="${cerere.filename}"`);
     res.setHeader('Content-Length', cerere.file_data.length);
-    
+
     // Trimitem datele
     res.send(cerere.file_data);
   } catch (err) {
@@ -119,20 +119,83 @@ const downloadCerere = async (req, res) => {
   }
 }
 
-const getOneCerereTip = async(req, res) =>{
-  try{
-    const cerere = await Cereri.findOne( {
+const getOneCerereTip = async (req, res) => {
+  try {
+    const cerere = await Cereri.findOne({
       where: {
-          id_cerere: req.params.id,
+        id_cerere: req.params.id,
       }
-  });
+    });
 
     console.log("Cerere gasita: ", cerere);
     res.json(cerere);
-  } catch(err) {
-    console.error('Eroare la getOneCerereTip:', err); 
-        res.status(500).json({ err: err.message });
+  } catch (err) {
+    console.error('Eroare la getOneCerereTip:', err);
+    res.status(500).json({ err: err.message });
   }
 }
-  
-module.exports = { uploadCerere, downloadCerere, getAllCereri, getOneCerereTip };
+
+const modifyCerere = async (req, res) => {
+  try {
+    const { title } = req.body;
+    const { type } = req.body;
+    const file = req.file;
+    if (!file) {
+      return res.status(400)
+        .json({ message: "Fisierul nu a fost incarcat!" });
+    }
+
+    if (!title) {
+      return res.status(400)
+        .json({ message: "Titlul nu a fost completat!" });
+    }
+
+    if (!type) {
+      return res.status(400)
+        .json({ message: "Nu s-a ales tipul cererii!" });
+    }
+
+    const cerereModificata = await Cereri.update({
+      title,
+      type,
+      mime_type: file.mimetype,
+      filename: file.originalname,
+      file_data: file.buffer,
+    }, {
+      where: {
+        id_cerere: req.params.id,
+      }
+    });
+
+    res.status(201).json({
+      message: "Fișier salvat cu succes!",
+      cerere: {
+        id_cerere: cerereModificata.id_cerere,
+        title: cerereModificata.title,
+        type: cerereModificata.type,
+        filename: cerereModificata.filename
+      }
+    });
+  } catch (err) {
+    console.error('Eroare la modifyCerere:', err);
+    res.status(500).json({ message: "Eroare la încărcarea fișierului", error: err.message });
+  }
+}
+
+const deleteCerere = async (req, res) => {
+  try {
+    const { id_cerere } = req.body;
+    await Cereri.destroy({
+      where: {
+        id_cerere: id_cerere
+      }
+    });
+
+    res.status(201).json({ message: "Cerere stearsa" });
+  } catch (err) {
+    console.error('Eroare la deleteCerere:', err);
+    res.status(500).json({ message: "Eroare la deleteCerere", error: err.message });
+  }
+}
+
+module.exports = { uploadCerere, downloadCerere, getAllCereri, getOneCerereTip, modifyCerere, deleteCerere };
