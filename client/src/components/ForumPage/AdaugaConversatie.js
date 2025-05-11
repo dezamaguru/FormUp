@@ -5,7 +5,7 @@ function AdaugaConversatie() {
     const [titlu, setTitlu] = useState("");
 
     const handleSubmit = async(e) => {
-        e.preventDefault();
+        //e.preventDefault();
 
         if(!titlu) {
             alert("Subiect obligatoriu!");
