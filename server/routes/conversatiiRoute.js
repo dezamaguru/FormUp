@@ -4,7 +4,9 @@ const verifyJWT = require('../middleware/verifyJWT');
 const conversatiiController = require('../controllers/conversatiiController');
 
 router.get('/', verifyJWT, conversatiiController.getAllConversatii);
-router.post('/upload', verifyJWT, conversatiiController.uploadConversatie)
+router.get('/mesaje/:id', verifyJWT, conversatiiController.getAllMessages);
+router.post('/upload', verifyJWT, conversatiiController.uploadConversatie);
+router.post('/send', verifyJWT, conversatiiController.sendMessage);
 
 module.exports = router;   
 

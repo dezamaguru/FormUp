@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             //allowNull: false
         },
+        type:{
+            type: DataTypes.ENUM('student', 'admin', 'secretar'),
+            //allowNull: false
+        },
         continut: {
             type: DataTypes.TEXT,
             //allowNull: false 

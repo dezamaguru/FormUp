@@ -10,10 +10,18 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'Users', 
+                model: 'Users',
                 key: 'userId'
             },
             onDelete: 'CASCADE'
+        },
+        program_studiu: {
+            type: DataTypes.ENUM('licenta', 'master'),
+            allowNull: false
+        },
+        an_studiu: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
         id_student: {
             type: DataTypes.INTEGER,
@@ -25,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         title: {
             type: DataTypes.TEXT,
-            allowNull: false 
+            allowNull: false
         }
     }, {
         tableName: 'conversatii'
