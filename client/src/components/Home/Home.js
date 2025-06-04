@@ -4,7 +4,6 @@ import StudentPage from "../StudentPage/StudentPage";
 import SecretarPage from "../SecretarPage/SecretarPage";
 import AdminPage from "../AdminPage/AdminPage";
 
-
 function Home() {
     const { auth } = useAuth();
 

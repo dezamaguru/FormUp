@@ -1,7 +1,19 @@
 import './StudentPage.css';
 import SideBar from '../SideBar/SideBar';
+import { useEffect } from 'react';
+import { generateToken, messaging } from "../Notificari/firebase";
+import { onMessage } from "firebase/messaging";
+import toast, { Toaster } from "react-hot-toast"
 
 function StudentPage() {
+
+      useEffect(() => {
+        generateToken();
+        onMessage(messaging, (payload) =>{
+            console.log(payload);
+            //toast("Here is your toast");
+        });
+    }, [])
 
 
   return (
@@ -10,6 +22,9 @@ function StudentPage() {
       <SideBar />
 
       {/* Main Content */}
+
+      {/* <Toaster position="top-right absolute"/> */}
+
       <main className="main-content">
         {/* Top bar */}
         <header className="header">
