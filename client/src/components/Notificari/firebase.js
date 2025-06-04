@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getMessaging, getToken } from "firebase/messaging"
+import { getMessaging, getToken, onMessage } from "firebase/messaging"
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -31,5 +31,16 @@ export const generateToken = async () => {
         vapidKey: "BIIdLCRQgFmhg0SUtPcDX3k-FBktNkPcm1IcmU1YD0amfwI_NkJwUoTphCR4alZHAUu1Btv8tj6gn59QXfGgGKo"
     });
     console.log(token);
+    return token;
+    } else {
+      throw new Error("Notification not granted");
     }
 };
+
+export const onMessageListener = () =>{
+  return new Promise((resolve) => {
+    onMessage(messaging, (payload)  => {
+      resolve(payload);
+    })
+  })
+}
