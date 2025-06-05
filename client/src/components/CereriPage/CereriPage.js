@@ -4,8 +4,13 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useNavigate, useLocation } from "react-router-dom";
 import SideBar from "../SideBar/SideBar";
 import useAuth from "../../hooks/useAuth";
+import { onMessage } from "firebase/messaging";
+import { Toaster } from "react-hot-toast";
+import { ToastContainer, toast } from 'react-toastify';
+import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 function Cereri() {
+  useFirebaseNotifications();
   const [cereri, setCereri] = useState([]);
   const [solicitari, setSolicitari] = useState([]);
   const [file, setFile] = useState(null);
@@ -101,6 +106,7 @@ function Cereri() {
 
   return (
     <div className="student-page">
+      <ToastContainer/>
       <SideBar />
 
       {/* Main Content */}

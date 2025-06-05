@@ -3,13 +3,18 @@ import useAuth from "../../hooks/useAuth";
 import StudentPage from "../StudentPage/StudentPage";
 import SecretarPage from "../SecretarPage/SecretarPage";
 import AdminPage from "../AdminPage/AdminPage";
+import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Home() {
     const { auth } = useAuth();
+    useFirebaseNotifications();
 
     return (
         <div>
             {/* <h1>Welcome, {auth?.email}!</h1> */}
+            <ToastContainer/>
 
             {auth?.type === 'admin' && (
                 <AdminPage />

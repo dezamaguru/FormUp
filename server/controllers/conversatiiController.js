@@ -1,4 +1,5 @@
 const { Conversatii, Mesaje, Users } = require('../models');
+const NotificationService = require('../service/NotificationService');
 
 const getAllConversatii = async (req, res) => {
     try {
@@ -53,7 +54,9 @@ const uploadConversatie = async (req, res) => {
             userId: req.userId,
             title: titlu,
             program_studiu: user.program_studiu,
-            an_studiu: user.an_studiu
+            an_studiu: user.an_studiu,
+            id_student: req.type === 'student' ? req.userId : null,
+            id_secretar: req.type === 'secretar' ? req.userId : null
         });
 
         res.status(201).json({
@@ -94,7 +97,10 @@ const sendMessage = async (req, res) => {
             return res.status(400).json({ message: "Datele sunt incomplete!" });
         }
 
-        console.log("Date primite:", { selectedConv, newMessage });
+        const conv = await Conversatii.findByPk(selectedConv);
+        if (!conv) {
+            return res.status(404).json({ message: "Conversația nu a fost găsită" });
+        }
 
         const message = await Mesaje.create({
             id_conversatie: selectedConv,
@@ -103,13 +109,66 @@ const sendMessage = async (req, res) => {
             type: req.type,
         });
 
-        console.log("Mesaj salvat:", message);
+        const expeditor = await Users.findByPk(req.userId);
+        const expeditorNume = expeditor?.firstName || expeditor?.email || "Utilizator";
 
+        console.log("Expeditor:", expeditorNume);
+        console.log("Tip expeditor:", req.type);
+
+        // Găsim destinatarul în funcție de tipul expeditorului
+        let destinatarId = null;
+        if (req.type === 'student') {
+            // Dacă expeditorul este student, destinatarul este secretarul
+            const secretari = await Users.findAll({
+                where: {
+                    type: 'secretar',
+                    program_studiu: conv.program_studiu,
+                    an_studiu: conv.an_studiu
+                }
+            });
+            if (secretari.length > 0) {
+                destinatarId = secretari[0].userId;
+                console.log("Destinatar (secretar) găsit:", destinatarId);
+            }
+        } else if (req.type === 'secretar') {
+            // Dacă expeditorul este secretar, destinatarul este studentul
+            destinatarId = conv.userId;
+            console.log("Destinatar (student) găsit:", destinatarId);
+        }
+
+        if (!destinatarId) {
+            console.warn(`Nu a fost găsit destinatarul pentru conversația ${selectedConv}`);
+        } else {
+            const destinatar = await Users.findByPk(destinatarId);
+            console.log("Detalii destinatar:", {
+                id: destinatar?.userId,
+                type: destinatar?.type,
+                fcmToken: destinatar?.fcmToken ? "Existent" : "Lipseste"
+            });
+            
+            if (destinatar?.fcmToken) {
+                try {
+                    await NotificationService.sendNotification(
+                        destinatar.fcmToken,
+                        `Mesaj nou de la ${expeditorNume}`,
+                        newMessage
+                    );
+                    console.log("Notificare trimisă cu succes către:", destinatarId);
+                } catch (notifErr) {
+                    console.error("Eroare la trimiterea notificării:", notifErr);
+                }
+            } else {
+                console.warn("Destinatarul nu are token FCM configurat");
+            }
+        }
+
+        console.log("Mesaj salvat:", message);
         res.status(201).json(message);
     } catch (err) {
         console.error("Eroare la sendMessage:", err);
         res.status(500).json({ message: "Eroare la sendMessage", error: err.message });
     }
 }
+
 
 module.exports = { getAllConversatii, uploadConversatie, sendMessage, getAllMessages }

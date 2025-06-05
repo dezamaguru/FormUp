@@ -10,6 +10,22 @@ const getAllUsers = async (req, res) => {
     }
 }
 
+const updateFcmToken = async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) return res.status(400).json({ message: "Tokenul lipsește" });
+
+  try {
+    await Users.update({ fcmToken: token }, {
+      where: { userId: req.userId }
+    });
+    res.status(200).json({ message: "Token salvat cu succes" });
+  } catch (err) {
+    console.error("Eroare la salvarea tokenului:", err);
+    res.status(500).json({ message: "Eroare server" });
+  }
+};
+
 const registerUser = async (req, res) => {
     const { lastName, firstName, email, password, type, program_studiu, an_studiu } = req.body;
     
@@ -30,4 +46,4 @@ const registerUser = async (req, res) => {
     }
 };
 
-module.exports = { getAllUsers, registerUser };
+module.exports = { getAllUsers, registerUser, updateFcmToken };

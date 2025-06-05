@@ -50,7 +50,11 @@ module.exports = (sequelize, DataTypes) =>{
             type: DataTypes.ENUM('IF', 'ID'//allowNull: false
 , 'null'),
             //allowNull: alse
+        },fcmToken: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
+        
     })
 
     return Users;

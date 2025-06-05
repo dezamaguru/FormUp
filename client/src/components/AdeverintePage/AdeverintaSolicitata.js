@@ -3,8 +3,13 @@ import { useParams } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 import SideBar from "../SideBar/SideBar";
+import { onMessage } from "firebase/messaging";
+import { Toaster } from "react-hot-toast";
+import { ToastContainer, toast } from 'react-toastify';
+import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 const AdeverintaSolicitata = () => {
+  useFirebaseNotifications();
   const { id } = useParams(); // extragerea id-ului din URL
   const [adeverinta, setAdeverinta] = useState(null);
   const axiosPrivate = useAxiosPrivate();
@@ -44,6 +49,16 @@ const AdeverintaSolicitata = () => {
       setFile(null);
       console.log("Fisierul incarcat:", res.data);
       getOneAdeverinta();
+
+      toast.success(
+        <div>
+          <div>
+            Notification sent
+          </div> 
+        </div>,
+        { position: 'top-right' }
+      )
+
       //alert("Fisier incarcat cu succes");
     } catch (err) {
       console.error("Eroare completă:", err);
@@ -73,11 +88,6 @@ const AdeverintaSolicitata = () => {
         }
       }
 
-      // if (!filename) {
-      //     console.warn('Numele fișierului lipsește în antetul Content-Disposition.');
-      //     filename = `adeverinta_${id}.pdf`; // Fallback mai descriptiv
-      // }
-
       const blob = new Blob([res.data], {
         type: res.headers["content-type"] || "application/octet-stream",
       });
@@ -103,6 +113,7 @@ const AdeverintaSolicitata = () => {
 
   return (
     <div className="student-page">
+      <ToastContainer />
       <SideBar />
 
       {auth?.type === "student" && (

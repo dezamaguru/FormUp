@@ -1,31 +1,37 @@
 import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../api/axios";
+import { onMessage } from "firebase/messaging";
+import { Toaster } from "react-hot-toast";
+import { ToastContainer, toast } from 'react-toastify';
+import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 function AdaugaConversatie() {
+    useFirebaseNotifications();
     const [titlu, setTitlu] = useState("");
 
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         //e.preventDefault();
 
-        if(!titlu) {
+        if (!titlu) {
             alert("Subiect obligatoriu!");
             return;
         }
 
-        try{
+        try {
             const res = await axiosPrivate.post('/inbox/upload', {
                 titlu
             });
 
             console.log("Conversatie: ", res.data);
             setTitlu("");
-        }catch(err){
+        } catch (err) {
             console.error('Eroare la upload conversatie:', err.response?.data);
         }
     }
 
     return (
         <div>
+            <ToastContainer />
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"

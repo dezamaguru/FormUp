@@ -1,12 +1,13 @@
 const { Cereri, Sequelize } = require('../models');
 const { Users } = require('../models');
 const { Solicitari_Cereri } = require('../models');
+const NotificationService = require("../service/NotificationService");
 
-const uploadSolicitareCerere = async(req, res) => {
-    try{
+const uploadSolicitareCerere = async (req, res) => {
+    try {
         const id_cerere = req.params.id;
         const file = req.file;
-  
+
         console.log("ID cerere:", id_cerere);
         console.log("ID utilizator:", req.userId);
         console.log("Fișier:", file);
@@ -24,10 +25,32 @@ const uploadSolicitareCerere = async(req, res) => {
             userId: req.userId,
             status: "Trimisa",
             mime_type: file.mimetype,
-            filename: file.originalname,
+            file_name: file.originalname, // <-- corect
             file_data: file.buffer,
         });
-  
+
+        const student = await Users.findByPk(req.userId);
+        const cerere = await Cereri.findByPk(id_cerere);
+
+        //Notificare către secretarii relevanți
+        const secretari = await Users.findAll({
+            where: {
+                type: 'secretar',
+                program_studiu: student.program_studiu,
+                an_studiu: student.an_studiu
+            }
+        });
+
+        await Promise.all(secretari.map(sec => {
+            if (sec.fcmToken) {
+                return NotificationService.sendNotification(
+                    sec.fcmToken,
+                    "Solicitare nouă de cerere",
+                    `Studentul ${student.firstName} ${student.lastName} a trimis o solicitare pentru: ${cerere.title}`
+                );
+            }
+        }));
+
         res.status(201).json({
             message: "Solicitare salvată cu succes!",
             newSolicitare: {
@@ -37,16 +60,16 @@ const uploadSolicitareCerere = async(req, res) => {
                 filename: newSolicitare.filename
             }
         });
-      
-    } catch(err) {
+
+    } catch (err) {
         console.error('Eroare la uploadCerere:', err);
         res.status(500).json({ message: "Eroare la încărcarea fișierului", error: err.message });
     }
 }
 
-const getAllSolicitariCereri = async(req, res) => {
-    try{
-        if(req.type === 'student') {
+const getAllSolicitariCereri = async (req, res) => {
+    try {
+        if (req.type === 'student') {
             const solicitari = await Solicitari_Cereri.findAll({
                 attributes: ["id_solicitare", "id_cerere", "userId", "status"],
                 where: {
@@ -58,13 +81,13 @@ const getAllSolicitariCereri = async(req, res) => {
             return res.json(solicitari);
         }
 
-        if(req.type === 'secretar') {
+        if (req.type === 'secretar') {
             const secretar = await Users.findByPk(req.userId);
-            if(!secretar) {
-                return res.status(404).json({message: "Profilul secretarului nu a fost gasit"});
+            if (!secretar) {
+                return res.status(404).json({ message: "Profilul secretarului nu a fost gasit" });
             }
 
-            const solicitari = await Solicitari_Cereri.findAll( {
+            const solicitari = await Solicitari_Cereri.findAll({
                 attributes: ["id_solicitare", "id_cerere", "userId", "status"],
                 include: {
                     model: Users,
@@ -81,31 +104,31 @@ const getAllSolicitariCereri = async(req, res) => {
             return res.json(solicitari);
         }
 
-    } catch(err) {
+    } catch (err) {
         console.log("Eroare la  getAllSolicitariCereri: ", err);
-        return res.status(500).json({message: "Eroare la getAllSolicitariCereri "});
+        return res.status(500).json({ message: "Eroare la getAllSolicitariCereri " });
     }
 }
 
-const getOneSolicitare = async(req, res) => {
-    try{
+const getOneSolicitare = async (req, res) => {
+    try {
         const solicitare = await Solicitari_Cereri.findOne({
-            where:{
+            where: {
                 id_solicitare: req.params.id,
             }
         })
-        
+
         console.log("Solicitare gasita: ", solicitare);
         res.json(solicitare);
-    } catch(err){
+    } catch (err) {
         console.log("Eroare la getOneSolicitare: ", err);
         res.status(500).json({ err: err.message });
     }
 }
 
 const updateStatusSolicitare = async (req, res) => {
-    const { statusSolicitare } = req.body; 
-    try{
+    const { statusSolicitare } = req.body;
+    try {
         await Solicitari_Cereri.update(
             {
                 status: statusSolicitare,
@@ -117,11 +140,24 @@ const updateStatusSolicitare = async (req, res) => {
             }
         );
         console.log("Status solictare modificat cu succes!")
-  
-    } catch (err ){
-        console.error('Eroare la updateStatusAdeverinta:', err); 
+
+        const solicitare = Solicitari_Cereri.findByPk(req.params.id);
+        const student = Users.findByPk(solicitare.userId);
+
+        if(student.fcmToken){
+            return NotificationService.sendNotification(
+                student.fcmToken,
+                "Status solicitare modificat",
+                `Solicitarea ${solicitare.file_name} a fost vizualizata`
+            )
+        }
+
+        res.status(200);
+
+    } catch (err) {
+        console.error('Eroare la updateStatusAdeverinta:', err);
         res.status(500).json({ err: err.message });
     }
-  }
+}
 
 module.exports = { uploadSolicitareCerere, getAllSolicitariCereri, getOneSolicitare, updateStatusSolicitare }

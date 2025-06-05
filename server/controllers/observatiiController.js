@@ -1,5 +1,5 @@
-const { where } = require('sequelize');
-const { Observatii_Cereri } = require('../models');
+const { Observatii_Cereri, Solicitari_Cereri, Users, Cereri } = require('../models');
+const NotificationService = require("../service/NotificationService");
 
 const getAllObservatii = async (req, res) => {
     try {
@@ -30,10 +30,24 @@ const uploadObservatie = async (req, res) => {
             id_secretar: req.userId
         });
 
+        //Trimite notificare către student
+        const solicitare = await Solicitari_Cereri.findByPk(req.params.id);
+        const student = await Users.findByPk(solicitare.userId);
+        const cerere = await Cereri.findByPk(solicitare.id_cerere);
+
+        if (student?.fcmToken) {
+            await NotificationService.sendNotification(
+                student.fcmToken,
+                "Observatie noua",
+                `Ai primit o noua observatie pentru ${solicitare.file_name}`
+            )
+        }
+
         res.status(201).json({
             message: "Observatie adaugata cu succes",
             observatie: newObservatie
         });
+
     } catch (err) {
         console.error('Eroare la uploadObservatie:', err);
         res.status(500).json({ message: "Eroare la uploadObservatie", error: err.message });
@@ -55,6 +69,18 @@ const modifyObservatie = async (req, res) => {
         }
         );
 
+        const solicitare = await Solicitari_Cereri.findByPk(req.params.id);
+        const student = await Users.findByPk(solicitare.userId);
+        const cerere = await Cereri.findByPk(solicitare.id_cerere);
+
+        if (student?.fcmToken) {
+            await NotificationService.sendNotification(
+                student.fcmToken,
+                "Observatie noua",
+                `Ai primit o noua observatie pentru ${solicitare.file_name}`
+            )
+        }
+
         res.status(201).json({
             message: "Observatie modificata cu succes"
         });
@@ -66,7 +92,7 @@ const modifyObservatie = async (req, res) => {
 
 const deleteObservatie = async (req, res) => {
     try {
-        const {id_observatie} = req.body;
+        const { id_observatie } = req.body;
         await Observatii_Cereri.destroy({
             where: {
                 id_observatie: id_observatie

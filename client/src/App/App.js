@@ -1,5 +1,4 @@
-import './App.css';
-import { Route, Routes} from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Login from '../components/Login/Login';
 import Home from '../components/Home/Home';
 import AddUser from '../components/Users/AddUser';
@@ -13,32 +12,37 @@ import AdeverintaSolicitata from '../components/AdeverintePage/AdeverintaSolicit
 import CerereTip from '../components/CereriPage/CerereTip';
 import SolicitareCerere from '../components/CereriPage/SolicitareCerere';
 import ForumPage from '../components/ForumPage/ForumPage';
+import useFirebaseNotifications from "../hooks/useFirebaseNotifications";
+import { ToastContainer, toast } from 'react-toastify';
 
 function App() {
+  useFirebaseNotifications();
+
   return (
     <div className="App">
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route path='/' element={<Login/>} />
-            <Route element={<PersistLogin/>}>
+      <ToastContainer />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path='/' element={<Login />} />
+          <Route element={<PersistLogin />}>
 
-              <Route element= { <RequireAuth/>}>  {/*sends straight to login page if not logged in*/ }
+            <Route element={<RequireAuth />}>  {/*sends straight to login page if not logged in*/}
 
-                <Route path='/home' element={<Home/>} />
-                <Route path='/adduser' element={<AddUser/>} />
-                <Route path='/users' element={<Users/>} />
-                <Route path='/cereri' element={<Cereri/>} />
-                <Route path='/adeverinte' element={<Adevererinte/>} />
-                <Route path='/adeverinte/:id' element={<AdeverintaSolicitata/>} />
-                <Route path='/cereri/:id' element={<CerereTip/>}/>
-                <Route path="/cereri/solicitari/:id" element={<SolicitareCerere />} />
-                <Route path="/inbox" element={<ForumPage />} />
-                
-              </Route>
-              
+              <Route path='/home' element={<Home />} />
+              <Route path='/adduser' element={<AddUser />} />
+              <Route path='/users' element={<Users />} />
+              <Route path='/cereri' element={<Cereri />} />
+              <Route path='/adeverinte' element={<Adevererinte />} />
+              <Route path='/adeverinte/:id' element={<AdeverintaSolicitata />} />
+              <Route path='/cereri/:id' element={<CerereTip />} />
+              <Route path="/cereri/solicitari/:id" element={<SolicitareCerere />} />
+              <Route path="/inbox" element={<ForumPage />} />
+
             </Route>
-          </Route>"
-        </Routes>
+
+          </Route>
+        </Route>"
+      </Routes>
     </div>
   );
 }

@@ -3,10 +3,18 @@ import { useState } from 'react';
 import './AddAdeverinta.css';
 import { axiosPrivate } from '../../api/axios';
 import './AdeverintePage.js';
+import { ToastContainer, toast } from 'react-toastify';
+import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 const AddAdeverinta = ({ onAdd }) => {
+  useFirebaseNotifications();
   const [name, setName] = useState('');
   const [tipAdeverinta, setTipAdeverinta] = useState('');
+
+  const [fcmToken, setFcmToken] = useState("");
+  const [title, setTile] = useState("");
+  const [body, setBody] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,21 +35,59 @@ const AddAdeverinta = ({ onAdd }) => {
       setTipAdeverinta('');
 
       if (onAdd) onAdd();
+      toast.success("Solicitarea a fost trimisă cu succes!", {
+        position: "top-right"
+      });
 
     } catch (err) {
       console.error('Eroare la trimiterea cererii:', err.response?.data);
     }
-    };
+
+    try {
+      var data = {
+        title: "Notificare adeverinta",
+        body: "Adeverinta primita"
+      };
+
+      const response = await axiosPrivate.post('/firebase/send-notification',
+         data);
+      console.log(response);
+      if (response.status === 200) {
+        toast.success(
+          <div>
+            <div>
+              Notification sent
+            </div>
+          </div>,
+          { position: 'top-right' }
+        )
+      } else {
+        toast.error(
+          <div>
+            <div>
+              Failed to send notification
+            </div>
+          </div>,
+          { position: 'top-right' }
+        )
+      }
+    } catch (err) {
+      console.error("Error at sending notification:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="proof-form">
+      <ToastContainer />
       <h2 className="form-title">Date adeverință</h2>
 
       <form onSubmit={handleSubmit}>
         <div className="form-row">
-          <select 
-            value={tipAdeverinta} 
-            onChange={(e) => setTipAdeverinta(e.target.value)} 
+          <select
+            value={tipAdeverinta}
+            onChange={(e) => setTipAdeverinta(e.target.value)}
             className="form-select"
           >
             <option value="" disabled hidden>Alege tipul adeverinței</option>
@@ -64,16 +110,16 @@ const AddAdeverinta = ({ onAdd }) => {
 
         <div className="form-grid">
           <div className="form-group">
-            <input 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
-              type="text" 
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              type="text"
               placeholder="Nume complet student"
-              required 
+              required
             />
           </div>
 
-        {/*
+          {/*
           <div className="form-group">
             <input id="email" type="email" placeholder="Email student" />
           </div>
@@ -112,7 +158,6 @@ const AddAdeverinta = ({ onAdd }) => {
         </div>
 
         <button type="submit" className="submit-btn">
-          <span className="submit-icon">▶</span>
           Trimite cerere
         </button>
       </form>

@@ -6,8 +6,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 import SideBar from "../SideBar/SideBar";
+import { onMessage } from "firebase/messaging";
+import { Toaster } from "react-hot-toast";
+import { ToastContainer, toast } from 'react-toastify';
+import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 function AdeverintePage() {
+  useFirebaseNotifications();
   const [showDropDown, setShowDropDown] = useState(false);
   const [adeverinte, setAdeverinte] = useState([]);
   const axiosPrivate = useAxiosPrivate();
@@ -53,7 +58,7 @@ function AdeverintePage() {
 
     if (currentStatus === "Procesare" || currentStatus === "Aprobata") {
       console.log("Statusul nu poate fi schimbat deoarece este deja:", currentStatus);
-      return; 
+      return;
     }
 
     try {
@@ -66,6 +71,7 @@ function AdeverintePage() {
 
   return (
     <div className="student-page">
+      <ToastContainer />
       <SideBar />
 
       <main className="main-content">

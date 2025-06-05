@@ -8,6 +8,7 @@ body {
 .student-page {
   display: flex;
   min-height: 100vh;
+  text-align: center;
 }
 
 /* Main content */
@@ -15,7 +16,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* ✅ înlocuiește space-between */
+  justify-content: flex-start; /*înlocuiește space-between */
   gap: 12rem; /* opțional: spațiu natural între header și conținut */
   padding: 2rem;
 }

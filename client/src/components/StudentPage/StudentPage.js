@@ -6,80 +6,70 @@ import { onMessage } from "firebase/messaging";
 import { Toaster } from "react-hot-toast";
 import { ToastContainer, toast } from 'react-toastify';
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 function StudentPage() {
+  useFirebaseNotifications();
   const axiosPrivate = useAxiosPrivate();
   const [fcmToken, setFcmToken] = useState("");
   const [title, setTile] = useState("");
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(false);
 
-        const fetchFcmToken = async () => {
-          try{
-              const token = await generateToken();
-              setFcmToken(token);
-              //console.log(token);
-          } catch(err) {
-            console.error("Error getting FCM token: ", err);
-          }
-        }
+  const fetchFcmToken = async () => {
+    try {
+      console.log("Începe generarea token-ului FCM...");
+      const token = await generateToken();
+      console.log("Token FCM generat:", token);
+      
+      console.log("Se salvează token-ul în baza de date...");
+      const response = await axiosPrivate.post('/users/fcm-token', { token });
+      console.log("Răspuns la salvarea token-ului:", response.data);
+      
+      setFcmToken(token);
+    } catch (err) {
+      console.error("Eroare la generarea/salvarea token-ului FCM:", err);
+      if (err.message === "Notification not granted") {
+        console.error("Utilizatorul nu a acordat permisiunea pentru notificări");
+      }
+    }
+  }
 
-      useEffect(() => {
-        fetchFcmToken();
-        onMessage(messaging, (payload) =>{
-            console.log(payload);
-            //toast("Here is your toast");
-        });
-    }, [])
+  useEffect(() => {
+    fetchFcmToken();
+  }, []);
 
-    onMessageListener().then(payload => {
-      toast(
-        <div>
-          <strong>{payload?.notification?.title || "No title"}</strong>
-          <br/>
-          <strong>{payload?.notification?.body || "No body"}</strong>
-        </div>,
-        {position: "top-right"}
-      );
-      console.log("Receieved foreground message", payload);
-    }).catch(err => console.error("error: ", err));
-
-    const handlePushNotification = async() =>{
-    // setTile("xfcgvhbjn");
-    // setBody("cgvhbjn");
-    // setFcmToken("xfcgvhbjn");
+  const handlePushNotification = async () => {
     setLoading(true);
-    try{
+    try {
       var data = {
         title: "Test",
-        body: "notificare test",
-        deviceToken: fcmToken
+        body: "notificare test de la student",
+        deviceToken: "fYLyQN5NAXoaMqPq6x3RjS:APA91bGePzcCGCbzzNIUaayrJEyjndrrEzox9mm6Y8WIgr1bDON7hVENUOowTRCSpFzKBmfkL0xcrPDBpxHLNA4bOr_9Yc1ZzzBsMdwZfWdC2kDh5w9dhI8"
       };
       const response = await axiosPrivate.post('/firebase/send-notification', data);
       console.log(response);
-      if(response.status === 200){
+      if (response.status === 200) {
         toast.success(
           <div>
             <div>
               Notification sent
             </div>
           </div>,
-          {position: 'top-right'}
-        ) 
-      } else{
-          toast.error(
+          { position: 'top-right' }
+        )
+      } else {
+        toast.error(
           <div>
             <div>
               Failed to send notification
             </div>
           </div>,
-          {position: 'top-right'}
-          )
-        }
-    } catch (err){
+          { position: 'top-right' }
+        )
+      }
+    } catch (err) {
       console.error("Error at sending notification:", err);
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -87,27 +77,10 @@ function StudentPage() {
   return (
     <div className="student-page">
       <ToastContainer />
-      {/* <div className='container firebase-form p-4'>
-        <div className='row'>
-        {
-          fcmToken && (
-            <div className='col-md-12 mb-4'> 
-              <div className='alert alert-info'> 
-                <strong> FCM Token: </strong> {fcmToken}
-              </div>
-            </div>
-          )
-        }
-        </div>
-
-      </div> */}
       {/* Sidebar */}
       <SideBar />
 
       {/* Main Content */}
-
-      {/* <Toaster position="top-right absolute"/> */}
-
       <main className="main-content">
         {/* Top bar */}
         <header className="header">
@@ -140,43 +113,14 @@ function StudentPage() {
             </div>
           </section>
 
-          {/* Attendance */}
-          {/* <section className="card attendance" style={{ gridArea: "attendance" }}>
-            <h3>Mark attendance</h3>
-            <select>
-              <option>Mathematics</option>
-            </select>
-            <input type="time" defaultValue="09:00" />
-            <div className="pager">
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button key={n}>{n}</button>
-              ))}
-            </div>
-            <button className="btn-primary">Present</button>
-          </section> */}
-
-          {/* Calendar */}
-          {/* <section className="card calendar" style={{ gridArea: "calendar" }}>
-            <h3>My Calendar</h3>
-            <p>March 2022</p>
-            <div className="calendar-grid">
-              {Array.from({ length: 30 }).map((_, i) => (
-                <div key={i} className={i === 14 ? 'active' : ''}>
-                  {i + 1}
-                </div>
-              ))}
-            </div>
-          </section> */}
-
           {/* News */}
           <section className="card news" style={{ gridArea: "news" }}>
             <h3>News & Updates</h3>
             <div className="news-box">
               <p>Universities to announce exams</p>
-              <button className="read-more" 
-              onClick={handlePushNotification} 
-              disabled = {loading}
-              >{loading ? 'Sending' : 'Send'}</button>
+              <button className="read-more"
+                onClick={handlePushNotification}
+              >Send</button>
             </div>
           </section>
         </div>

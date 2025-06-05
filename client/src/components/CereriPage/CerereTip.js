@@ -5,8 +5,13 @@ import { useParams } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useNavigate } from "react-router-dom";
+import { onMessage } from "firebase/messaging";
+import { Toaster } from "react-hot-toast";
+import { ToastContainer, toast } from 'react-toastify';
+import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 function CerereTip() {
+    useFirebaseNotifications();
     const { id } = useParams();
     const [cerereTip, setCerereTip] = useState(null);
     const axiosPrivate = useAxiosPrivate();
@@ -16,6 +21,10 @@ function CerereTip() {
     const [title, setTitle] = useState("");
     const [type, setType] = useState("");
     const navigate = useNavigate();
+    const [fcmToken, setFcmToken] = useState("");
+    const [titleNotificare, setTileNotificare] = useState("");
+    const [body, setBody] = useState("");
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const getOneCerere = async () => {
@@ -100,7 +109,11 @@ function CerereTip() {
 
             setFile(null);
             console.log("Solicitare adăugată cu succes!", res.data);
-            alert("Fișier încărcat cu succes");
+            
+            toast.success("Solicitarea a fost trimisă!", {
+                position: "top-right"
+            });
+
 
         } catch (err) {
             console.error("Eroare completă:", err);
@@ -151,6 +164,7 @@ function CerereTip() {
 
     return (
         <div className="student-page">
+            <ToastContainer />
             <SideBar />
 
             <main className="main-content">

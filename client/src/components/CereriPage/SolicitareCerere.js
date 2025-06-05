@@ -5,8 +5,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import SideBar from "../SideBar/SideBar";
 import { useParams } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { onMessage } from "firebase/messaging";
+import { Toaster } from "react-hot-toast";
+import { ToastContainer, toast } from 'react-toastify';
+import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 function SolicitareCerere() {
+    useFirebaseNotifications();
     const [solicitare, setSolicitare] = useState();
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
@@ -14,15 +19,11 @@ function SolicitareCerere() {
     const { auth } = useAuth();
     const { id } = useParams();
     const [statusSolicitare, setStatusAdeverinta] = useState("");
-
     const [title, setTitle] = useState("");
     const [continut, setContinut] = useState("");
-
     const [titleModificat, setTitleModificat] = useState("");
     const [continutModificat, setContinutModificat] = useState("");
-
     const [observatii, setObservatii] = useState([]);
-
     const [selectedObservatieId, setSelectedObservatieId] = useState(null);
 
     useEffect(() => {
@@ -76,7 +77,7 @@ function SolicitareCerere() {
     }, [axiosPrivate]);
 
 
-    const handleUpload = async (e) => {
+    const handleUploadObservatie = async (e) => {
         e.preventDefault();
 
         if (!title || !continut) {
@@ -89,6 +90,19 @@ function SolicitareCerere() {
                 continut
             });
 
+            var data = {
+                title: "Notificare onservatie",
+                body: "Observatie primita"
+            };
+
+            toast.success(
+                <div>
+                    <div>
+                        Observatie trimisa cu succes!
+                    </div>
+                </div>,
+                { position: 'top-right' }
+            )
             setObservatii((prev) => [...prev, res.data.observatie]);
             setTitle("");
             setContinut("");
@@ -99,15 +113,23 @@ function SolicitareCerere() {
         }
     }
 
-    const handleStatusChange = async (id) => {
-
+    const handleStatusChange = async (e, id) => {
+        e.preventDefault();
         try {
-
             const res = await axiosPrivate.post(`/cereri/solicitari/${id}/status`, {
                 statusSolicitare
             });
             setStatusAdeverinta("");
             console.log("Status-ul solicitarii a fost actualzizat: ", res.data);
+
+            toast.success(
+                <div>
+                    <div>
+                        Statusul solicitării a fost actualizat cu succes!
+                    </div>
+                </div>,
+                { position: 'top-right' }
+            )
         } catch (err) {
             console.log("Eroare la actualizarea statusului solicitarii: ", err);
         }
@@ -122,6 +144,15 @@ function SolicitareCerere() {
                 id_observatie: id_observatie
             });
 
+            toast.success(
+                <div>
+                    <div>
+                        Observatie modificata cu succes!
+                    </div>
+                </div>,
+                { position: 'top-right' }
+            )
+
             setTitle("");
             setContinut("");
             console.log("Obsservatia a fost modificata cu succes!", res.data);
@@ -130,19 +161,20 @@ function SolicitareCerere() {
         }
     }
 
-    const handleDeleteObservatie = async(id_observatie) => {
-        try{
+    const handleDeleteObservatie = async (id_observatie) => {
+        try {
             const res = await axiosPrivate.post(`/cereri/solicitari/${id}/delete`, {
                 id_observatie: id_observatie
             })
             console.log("Observatie stearsa", res.data);
-        } catch(err) {
+        } catch (err) {
             console.log("Eroare la stergere obseravtie");
         }
     }
 
     return (
         <div className="student-page">
+            <ToastContainer />
             <SideBar />
 
             {/* Main Content */}
@@ -208,7 +240,7 @@ function SolicitareCerere() {
                                     <p>ID Cerere: {solicitare.id_cerere}</p>
                                     <p>ID Utilizator: {solicitare.userId}</p>
                                     <p>Status: {solicitare.status}</p>
-                                    <form onSubmit={() => handleStatusChange(solicitare.id_solicitare)}>
+                                    <form onSubmit={(e) => handleStatusChange(e, solicitare.id_solicitare)}>
                                         <select
                                             value={statusSolicitare}
                                             onChange={(e) => setStatusAdeverinta(e.target.value)}
@@ -230,7 +262,7 @@ function SolicitareCerere() {
                         <section className="card-cereri-observatie" style={{ gridArea: "observatie" }}>
                             <strong>Observatii</strong>
                             <div className='container-form-observatii'>
-                                <form onSubmit={handleUpload} style={{ marginBottom: "20px" }}>
+                                <form onSubmit={handleUploadObservatie} style={{ marginBottom: "20px" }}>
                                     <input
                                         type='text'
                                         placeholder='Titlu observatie'
@@ -289,7 +321,7 @@ function SolicitareCerere() {
                                                         setContinutModificat(observatie.continut);
                                                     }}>Modifica</button>
                                                     <button
-                                                    onClick={()=> handleDeleteObservatie(observatie.id_observatie)}
+                                                        onClick={() => handleDeleteObservatie(observatie.id_observatie)}
                                                     >Sterge</button>
                                                 </>
                                             )}
