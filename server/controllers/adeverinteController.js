@@ -1,5 +1,6 @@
 const { Solicitari_Adeverinte, Users } = require('../models');
 const NotificationService = require("../service/NotificationService");
+const EmailService = require("../service/EmailService");
 
 const getAllAdeverinte = async (req, res) => {
     try {
@@ -83,6 +84,17 @@ const adaugaSolicitare = async (req, res) => {
             }
         }));
 
+        //trimite mail
+        await Promise.all(secretari.map(sec => {
+            if (sec.email) {
+                return EmailService.sendEmail({
+                    to: sec.email,
+                    subject: "Solicitare nouă de adeverință",
+                    text: `Studentul ${name} a trimis o cerere pentru adeverința: ${tipAdeverinta}`,
+                    html: `<p>Studentul <strong>${name}</strong> a trimis o cerere pentru adeverința: <strong>${tipAdeverinta}</strong>.</p>`,
+                });
+            }
+        }));
 
         res.status(201).json({
             message: "Adeverință adăugată cu succes!",
@@ -112,6 +124,7 @@ const updateStatusAdeverinta = async (req, res) => {
 
         const adeverinta = await Solicitari_Adeverinte.findByPk(req.params.id);
         const student = await Users.findByPk(adeverinta.userId);
+
         if (student.fcmToken) {
             return NotificationService.sendNotification(
                 student.fcmToken,
@@ -119,6 +132,21 @@ const updateStatusAdeverinta = async (req, res) => {
                 `Adevrinta ${adeverinta.tip_adeverinta} a fost vazuta de un responsabil`
             );
         }
+
+        // Trimite email către student
+        await EmailService.sendEmail({
+            to: student.email,
+            subject: "Adeverința este în procesare",
+            text: `Cererea ta pentru adeverința "${adeverinta.tip_adeverinta}" a fost preluată și este în curs de procesare.`,
+            html: `
+                <p>Bună, ${student.name || "student"}</p>
+                <p>Cererea ta pentru adeverința <strong>${adeverinta.tip_adeverinta}</strong> a fost <strong>văzută</strong> de secretariat și este acum în curs de procesare.</p>
+                <p>Vei fi notificat(ă) când documentul este gata pentru descărcare.</p>
+                <br/>
+                <p>Cu stimă,</p>
+                <p><strong>FormUp</strong></p>
+            `
+        });
 
     } catch (err) {
         console.error('Eroare la updateStatusAdeverinta:', err);
@@ -175,6 +203,20 @@ const uploadAdeverintaSolicitata = async (req, res) => {
                 `Adeverinta ${adeverinta.tip_adeverinta} poate fi descarcata`
             );
         }
+
+        await EmailService.sendEmail({
+            to: student.email,
+            subject: "Adeverința ta a fost aprobată",
+            text: `Adeverința solicitată (${adeverinta.tip_adeverinta}) a fost aprobată și este disponibilă pentru descărcare din platformă.`,
+            html: `
+                <p>Bună, ${student.firstName} ${student.lastName},</p>
+                <p>Adeverința ta pentru <strong>${adeverinta.tip_adeverinta}</strong> a fost aprobată.</p>
+                <p>O poți descărca din platforma <strong>FormUp</strong> accesând secțiunea „Adeverințe”.</p>
+                <br/>
+                <p>Cu stimă,</p>
+                <p>Echipa FormUp</p>
+            `
+        });
 
         res.status(201).json({
             message: "Adeverinta incarcata cu succes!"

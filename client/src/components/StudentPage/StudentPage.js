@@ -18,11 +18,9 @@ function StudentPage() {
 
   const fetchFcmToken = async () => {
     try {
-      console.log("Începe generarea token-ului FCM...");
       const token = await generateToken();
       console.log("Token FCM generat:", token);
-      
-      console.log("Se salvează token-ul în baza de date...");
+    
       const response = await axiosPrivate.post('/users/fcm-token', { token });
       console.log("Răspuns la salvarea token-ului:", response.data);
       

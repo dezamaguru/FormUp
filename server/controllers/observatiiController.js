@@ -1,5 +1,6 @@
 const { Observatii_Cereri, Solicitari_Cereri, Users, Cereri } = require('../models');
 const NotificationService = require("../service/NotificationService");
+const EmailService = require("../service/EmailService");
 
 const getAllObservatii = async (req, res) => {
     try {
@@ -43,6 +44,26 @@ const uploadObservatie = async (req, res) => {
             )
         }
 
+        // Trimitere email
+        await EmailService.sendEmail({
+            to: student.email,
+            subject: "Observație nouă pentru cererea ta",
+            text: `Ai primit o observație pentru fișierul "${solicitare.file_name}":\nTitlu: ${title}\nConținut: ${continut}`,
+            html: `
+                <p>Bună, ${student.firstName} ${student.lastName},</p>
+                <p>Ai primit o <strong>observație nouă</strong> din partea secretariatului pentru cererea:</p>
+                <ul>
+                  <li><strong>${cerere.title}</strong></li>
+                  <li><strong>Fișier încărcat:</strong> ${solicitare.file_name}</li>
+                </ul>
+                <p><strong>${title}</strong></p>
+                <p>${continut}</p>
+                <p>Poți vizualiza această observație în platformă, în secțiunea cererii respective.</p>
+                <br/>
+                <p>Cu stimă,<br/>Echipa FormUp</p>
+            `
+        });
+
         res.status(201).json({
             message: "Observatie adaugata cu succes",
             observatie: newObservatie
@@ -80,6 +101,25 @@ const modifyObservatie = async (req, res) => {
                 `Ai primit o noua observatie pentru ${solicitare.file_name}`
             )
         }
+
+        //Email student
+        await EmailService.sendEmail({
+            to: student.email,
+            subject: "Observație modificată pentru cererea ta",
+            text: `Observația pentru fișierul "${solicitare.file_name}" a fost actualizată:\nTitlu: ${titleModificat}\nConținut: ${continutModificat}`,
+            html: `
+                <p>Bună, ${student.firstName} ${student.lastName},</p>
+                <p>Observația pentru cererea <strong>${cerere.title}</strong> a fost modificată.</p>
+                <ul>
+                  <li><strong>Fișier atașat:</strong> ${solicitare.file_name}</li>
+                </ul>
+                <p><strong>${titleModificat}</strong></p>
+                <p>${continutModificat}</p>
+                <p>Poți consulta noua observație în platformă.</p>
+                <br/>
+                <p>Cu stimă,<br/>Echipa FormUp</p>
+            `
+        });
 
         res.status(201).json({
             message: "Observatie modificata cu succes"

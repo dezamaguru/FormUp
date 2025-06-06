@@ -1,5 +1,6 @@
 const { Conversatii, Mesaje, Users } = require('../models');
 const NotificationService = require('../service/NotificationService');
+const EmailService = require("../service/EmailService");
 
 const getAllConversatii = async (req, res) => {
     try {
@@ -145,7 +146,7 @@ const sendMessage = async (req, res) => {
                 type: destinatar?.type,
                 fcmToken: destinatar?.fcmToken ? "Existent" : "Lipseste"
             });
-            
+
             if (destinatar?.fcmToken) {
                 try {
                     await NotificationService.sendNotification(
@@ -154,6 +155,24 @@ const sendMessage = async (req, res) => {
                         newMessage
                     );
                     console.log("Notificare trimisă cu succes către:", destinatarId);
+
+                    // Trimite email
+                    await EmailService.sendEmail({
+                        to: destinatar.email,
+                        subject: `Mesaj nou de la ${expeditorNume} în FormUp`,
+                        text: `Ai primit un mesaj nou:\n\n${newMessage}`,
+                        html: `
+        <p>Bună, ${destinatar.firstName} ${destinatar.lastName},</p>
+        <p>Ai primit un mesaj nou în platforma <strong>FormUp</strong> de la <strong>${expeditorNume}</strong>.</p>
+        <blockquote style="border-left: 4px solid #ccc; padding-left: 10px; color: #555;">
+            ${newMessage}
+        </blockquote>
+        <p>Pentru a răspunde, intră în secțiunea „Inbox” din platformă.</p>
+        <br/>
+        <p>Cu stimă,<br/>Echipa FormUp</p>
+    `
+                    });
+
                 } catch (notifErr) {
                     console.error("Eroare la trimiterea notificării:", notifErr);
                 }

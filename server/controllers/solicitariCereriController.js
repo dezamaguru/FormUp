@@ -2,6 +2,8 @@ const { Cereri, Sequelize } = require('../models');
 const { Users } = require('../models');
 const { Solicitari_Cereri } = require('../models');
 const NotificationService = require("../service/NotificationService");
+const EmailService = require("../service/EmailService");
+
 
 const uploadSolicitareCerere = async (req, res) => {
     try {
@@ -42,14 +44,37 @@ const uploadSolicitareCerere = async (req, res) => {
         });
 
         await Promise.all(secretari.map(sec => {
-            if (sec.fcmToken) {
-                return NotificationService.sendNotification(
+            const notificare = sec.fcmToken
+                ? NotificationService.sendNotification(
                     sec.fcmToken,
                     "Solicitare nouă de cerere",
                     `Studentul ${student.firstName} ${student.lastName} a trimis o solicitare pentru: ${cerere.title}`
-                );
-            }
+                )
+                : Promise.resolve();
+
+            const email = EmailService.sendEmail({
+                to: sec.email,
+                subject: "Solicitare nouă primită",
+                text: `Studentul ${student.firstName} ${student.lastName} a trimis o solicitare pentru cererea: ${cerere.title}.`,
+                html: `
+      <p>Bună ziua,</p>
+      <p>Studentul <strong>${student.firstName} ${student.lastName}</strong> a trimis o solicitare pentru cererea:</p>
+      <ul>
+        <li><strong>${cerere.title}</strong></li>
+        <li><strong>Program de studiu:</strong> ${student.program_studiu}</li>
+        <li><strong>An de studiu:</strong> ${student.an_studiu}</li>
+      </ul>
+      <p>Puteți vizualiza această solicitare în platformă în secțiunea corespunzătoare.</p>
+      <br/>
+      <p>Cu stimă,<br/>Echipa FormUp</p>
+    `
+            });
+
+            return Promise.all([notificare, email]);
         }));
+
+
+
 
         res.status(201).json({
             message: "Solicitare salvată cu succes!",
@@ -141,16 +166,31 @@ const updateStatusSolicitare = async (req, res) => {
         );
         console.log("Status solictare modificat cu succes!")
 
-        const solicitare = Solicitari_Cereri.findByPk(req.params.id);
-        const student = Users.findByPk(solicitare.userId);
+        const solicitare = await Solicitari_Cereri.findByPk(req.params.id);
+        const student = await Users.findByPk(solicitare.userId);
 
-        if(student.fcmToken){
+        if (student.fcmToken) {
             return NotificationService.sendNotification(
                 student.fcmToken,
                 "Status solicitare modificat",
                 `Solicitarea ${solicitare.file_name} a fost vizualizata`
             )
         }
+
+        // Email
+        await EmailService.sendEmail({
+            to: student.email,
+            subject: "Actualizare privind solicitarea ta",
+            text: `Solicitarea ta pentru fișierul "${solicitare.file_name}" a fost actualizată cu statusul: ${statusSolicitare}.`,
+            html: `
+                <p>Bună, ${student.firstName} ${student.lastName},</p>
+                <p>Statusul solicitării tale pentru <strong>${solicitare.file_name}</strong> a fost actualizat:</p>
+                <p><strong>Status curent:</strong> ${statusSolicitare}</p>
+                <br/>
+                <p>Poți verifica detalii în platforma FormUp.</p>
+                <p>Cu stimă,<br/>Echipa FormUp</p>
+            `
+        });
 
         res.status(200);
 

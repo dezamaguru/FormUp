@@ -1,5 +1,6 @@
 const { Cereri, Sequelize } = require('../models');
 const { Users } = require('../models');
+const EmailService = require("../service/EmailService");
 
 const getAllCereri = async (req, res) => {
   try {
@@ -68,6 +69,33 @@ const uploadCerere = async (req, res) => {
       file_data: file.buffer,
     });
 
+    // Găsește toți secretarii
+    const secretari = await Users.findAll({
+      where: { type: 'secretar' }
+    });
+
+    // Trimite câte un email fiecărui secretar
+    await Promise.all(secretari.map(secretar => {
+      return EmailService.sendEmail({
+        to: secretar.email,
+        subject: "Cerere nouă adăugată în platformă",
+        text: `A fost adăugată o nouă cerere de tip: ${newCerere.type} cu titlul: ${newCerere.title}.`,
+        html: `
+      <p>Bună ziua,</p>
+      <p>A fost adăugată o nouă cerere în platformă:</p>
+      <ul>
+        <li><strong>Tip:</strong> ${newCerere.type}</li>
+        <li><strong>Titlu:</strong> ${newCerere.title}</li>
+        <li><strong>Fișier:</strong> ${newCerere.filename}</li>
+      </ul>
+      <p>Vă rugăm să o verificați în secțiunea corespunzătoare din interfața secretariatului.</p>
+      <br/>
+      <p>Cu stimă,<br/>Echipa FormUp</p>
+    `
+      });
+    }));
+
+
     // Returnăm doar datele necesare pentru frontend
     res.status(201).json({
       message: "Fișier salvat cu succes!",
@@ -78,6 +106,8 @@ const uploadCerere = async (req, res) => {
         filename: newCerere.filename
       }
     });
+
+
   } catch (err) {
     console.error('Eroare la uploadCerere:', err);
     res.status(500).json({ message: "Eroare la încărcarea fișierului", error: err.message });
