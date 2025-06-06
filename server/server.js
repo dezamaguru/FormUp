@@ -1,15 +1,30 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
 const cookieParser = require('cookie-parser');
 const credentials = require('./middleware/credentials');
+const redis = require('redis');
+const bodyParser = require('body-parser');
 
+const app = express();
 app.use(credentials);
-
 app.use(cors(corsOptions)); 
-
 app.use(express.json());
+
+app.use(bodyParser.json());
+
+//Redis
+const client = redis.createClient({url: 'redis://127.0.0.1:6379'})
+client.on('error', err => console.log('Redis client Error', err));
+
+(async () => {
+  await client.connect();
+})();
+
+// client.set("Web", "Js");
+// console.log(client.get("Web"));
+
+module.exports = client; 
 
 //middleware for cookies
 app.use(cookieParser());

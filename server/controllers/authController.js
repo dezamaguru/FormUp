@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const { Users } = require('../models');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const redisClient = require('../server');
 
 const handleLogin = async (req, res) => {
     const { email, password } = req.body;
@@ -43,8 +44,12 @@ const handleLogin = async (req, res) => {
             { expiresIn: '10m' }
         );
         //saving refresh token in db
-        foundUser.token = refreshToken;
-        await foundUser.save();
+        // foundUser.token = refreshToken;
+        // await foundUser.save();
+
+        //salevaza token in redis (cheie: token , valoare: userId)
+        await redisClient.set(accessToken, foundUser.userId, {EX: 300}); //5 minute
+        await redisClient.set(refreshToken, foundUser.userId, { EX: 86400  }); // 1 day
 
         //send token to user as a cookie 
         //set cookie as httpOnly so it is no available to javascript
