@@ -1,0 +1,191 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #c9e0f6, #ffffff);
+}
+
+.student-page {
+  display: flex;
+  min-height: 100vh;
+  text-align: center;
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /*înlocuiește space-between */
+  gap: 12rem; /* opțional: spațiu natural între header și conținut */
+  padding: 2rem;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Header buttons */
+.header-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.icon-button {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.icon-button:hover {
+  background: #e2e8f0;
+}
+
+.avatar-button {
+  font-size: 1.3rem;
+  background: #dbeafe;
+}
+
+/* Dashboard grid */
+.dashboard {
+  display: grid;
+  grid-template-areas:
+    "classes classes news"
+    "classes classes  news";
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+
+/* Card style */
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+/* Classes */
+.class-card {
+  background: #f1f5f9;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+/* Attendance */
+.attendance select,
+.attendance input[type="time"] {
+  display: block;
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+}
+
+.pager {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.pager button {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #67a5f8;
+  color: white;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* Calendar */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.3rem;
+  margin-top: 1rem;
+}
+
+.calendar-grid div {
+  background: #e2e8f0;
+  padding: 0.6rem;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.calendar-grid .active {
+  background: #3b82f6;
+  color: white;
+}
+
+/* News */
+.news-box {
+  margin-top: 1rem;
+}
+
+.news-box img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.read-more {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: #67a5f8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.stat-nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat-nav button {
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.stat-nav button:hover {
+  background-color: #2563eb;
+}
+
+.stat-nav button.active {
+  background-color: #1e40af;
+  font-weight: bold;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
