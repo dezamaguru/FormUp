@@ -5,6 +5,7 @@ import { generateToken} from "../Notificari/firebase";
 import { ToastContainer, toast } from 'react-toastify';
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
+import Map from '../Maps/GoogleMaps';
 
 function StudentPage() {
   useFirebaseNotifications();
@@ -114,6 +115,10 @@ function StudentPage() {
                 onClick={handlePushNotification}
               >Send</button>
             </div>
+          </section>
+
+          <section>
+            <Map/>
           </section>
         </div>
       </main>

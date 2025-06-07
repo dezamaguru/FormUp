@@ -189,3 +189,34 @@ body {
   font-weight: bold;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
+
+.stat-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-nav button {
+  background: #e0e7ff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-weight: 500;
+}
+
+.stat-nav button:hover {
+  background: #c7d2fe;
+}
+
+.stat-nav .active {
+  background: #6366f1;
+  color: white;
+}
+
+.pdf-button:hover {
+  background-color: #22c55e !important;
+}
+
