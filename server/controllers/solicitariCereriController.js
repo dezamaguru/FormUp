@@ -200,4 +200,9 @@ const updateStatusSolicitare = async (req, res) => {
     }
 }
 
-module.exports = { uploadSolicitareCerere, getAllSolicitariCereri, getOneSolicitare, updateStatusSolicitare }
+module.exports = {
+    uploadSolicitareCerere,
+    getAllSolicitariCereri,
+    getOneSolicitare,
+    updateStatusSolicitare
+}

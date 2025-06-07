@@ -2,7 +2,6 @@ body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(to right, #c9e0f6, #ffffff);
-  /* min-height: 100vh; */
 }
 
 .student-page {

@@ -1,0 +1,51 @@
+.section-title {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  text-align: left;
+  color: #1e293b;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.stat-card h3 {
+  margin: 0;
+  color: #334155;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.stat-card p {
+  margin-top: 0.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.filtru-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filtru-container select {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.statistici-container {
+  padding: 1rem;
+}
+

@@ -298,7 +298,9 @@ const downloadAdeverintaSolicitata = async (req, res) => {
     }
 }
 
+
 module.exports = {
     adaugaSolicitare, getAllAdeverinte, getOneAdeverinta,
-    uploadAdeverintaSolicitata, downloadAdeverintaSolicitata, updateStatusAdeverinta
+    uploadAdeverintaSolicitata, downloadAdeverintaSolicitata, 
+    updateStatusAdeverinta
 };

@@ -1,4 +1,4 @@
-module.exports = (sequelize, DataTypes) =>{
+module.exports = (sequelize, DataTypes) => {
 
     const Users = sequelize.define("Users", {
         userId: {
@@ -43,18 +43,22 @@ module.exports = (sequelize, DataTypes) =>{
         },
         forma_finantare: {
             type: DataTypes.ENUM('buget', 'taxa', 'null'),
-//allowNull: false
+            //allowNull: false
             //allowNull: false
         },
         forma_invatamant: {
-            type: DataTypes.ENUM('IF', 'ID'//allowNull: false
-, 'null'),
-            //allowNull: alse
-        },fcmToken: {
+            type: DataTypes.ENUM('IF', 'ID', 'null'),
+            //allowNull: false
+        },
+        facultate: {
+            type: DataTypes.ENUM('Informatica Economica EN', 'Informatica Economica', 'Statistica', 'Cibernetica'),
+            allowNull: true
+        },
+        fcmToken: {
             type: DataTypes.STRING,
             allowNull: true
         }
-        
+
     })
 
     return Users;
