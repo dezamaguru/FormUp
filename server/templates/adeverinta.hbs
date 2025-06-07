@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Adeverință</title>
+  <style>
+    body {
+      font-family: "Times New Roman", Times, serif;
+      margin: 50px;
+      line-height: 1.5;
+    }
+    .header {
+      text-align: center;
+    }
+    .title {
+      text-align: center;
+      font-weight: bold;
+      font-size: 24px;
+      margin: 40px 0 20px;
+    }
+    .content {
+      text-align: justify;
+    }
+    .footer {
+      margin-top: 60px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .footer div {
+      width: 40%;
+      text-align: center;
+    }
+    .label {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>Ministerul Educației și Cercetării</div>
+    <div>Academia de Studii Economice din București</div>
+    <div>Nr. {{nr_adeverinta}} / {{data_emitere}}</div>
+  </div>
+
+  <br>
+
+  <div class="header">
+    <div class="label">FACULTATEA DE CIBERNETICĂ, STATISTICĂ ȘI INFORMATICĂ ECONOMICĂ</div>
+    <div>Domeniul: {{domeniu}}</div>
+    <div>Programul de studii: {{program_studiu}}</div>
+    <div>Forma de învățământ: {{forma_invatamant}}</div>
+    <div>Limba de predare: {{limba}}; Locația geografică: {{locatie}}</div>
+  </div>
+
+  <div class="title">ADEVERINȚĂ</div>
+
+  <div class="content">
+    Adeverim prin prezenta că studentul <strong>{{nume}}</strong>, născut în <strong>{{data_nasterii}}</strong>, 
+    este înscris în anul universitar <strong>{{an_universitar}}</strong> la studii universitare de 
+    <strong>{{ciclu}}</strong>, în anul <strong>{{an_studiu}}</strong>, la forma de finanțare 
+    <strong>{{forma_finantare}}</strong>.
+    <br><br>
+    Adeverința este eliberată pentru:<br>
+    <strong>{{motiv}}</strong>
+  </div>
+
+  <div class="footer">
+    <div>
+      <div class="label">Decan</div>
+      <div><br><br>Prof. univ. dr. Claudiu HERŢELIU</div>
+    </div>
+    <div>
+      <div class="label">Secretar șef facultate</div>
+      <div><br><br>Claudia COSTACHE</div>
+    </div>
+  </div>
+
+</body>
+</html>

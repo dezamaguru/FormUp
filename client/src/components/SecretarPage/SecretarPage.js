@@ -1,8 +1,6 @@
 import './SecretarPage.css';
 import SideBar from "../SideBar/SideBar";
-import { generateToken, messaging, onMessageListener } from "../Notificari/firebase";
-import { onMessage } from "firebase/messaging";
-import { Toaster } from "react-hot-toast";
+import { generateToken} from "../Notificari/firebase";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -12,9 +10,6 @@ function SecretarRole() {
   useFirebaseNotifications();
   const axiosPrivate = useAxiosPrivate();
   const [fcmToken, setFcmToken] = useState("");
-  const [title, setTile] = useState("");
-  const [body, setBody] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const fetchFcmToken = async () => {
     try {
@@ -31,21 +26,7 @@ function SecretarRole() {
     fetchFcmToken();
   }, []);
 
-  // onMessageListener().then(payload => {
-  //   toast(
-  //     <div>
-  //       <strong>{payload?.notification?.title || "No title"}</strong>
-  //       <br />
-  //       <strong>{payload?.notification?.body || "No body"}</strong>
-  //     </div>,
-  //     { position: "top-right" }
-  //   );
-  //   console.log("Receieved foreground message", payload);
-  // })
-  //   .catch(err => console.error("error: ", err));
-
   const handlePushNotification = async () => {
-    setLoading(true);
     try {
       var data = {
         title: "Test",

@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../api/axios";
-import { onMessage } from "firebase/messaging";
-import { Toaster } from "react-hot-toast";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer} from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 function AdaugaConversatie() {

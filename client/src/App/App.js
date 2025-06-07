@@ -13,7 +13,8 @@ import CerereTip from '../components/CereriPage/CerereTip';
 import SolicitareCerere from '../components/CereriPage/SolicitareCerere';
 import ForumPage from '../components/ForumPage/ForumPage';
 import useFirebaseNotifications from "../hooks/useFirebaseNotifications";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer} from 'react-toastify';
+import Dashboard from '../components/Charts/Dashboard';
 
 function App() {
   useFirebaseNotifications();
@@ -37,9 +38,9 @@ function App() {
               <Route path='/cereri/:id' element={<CerereTip />} />
               <Route path="/cereri/solicitari/:id" element={<SolicitareCerere />} />
               <Route path="/inbox" element={<ForumPage />} />
+              <Route path='/dashboard' element={<Dashboard />} />
 
             </Route>
-
           </Route>
         </Route>"
       </Routes>

@@ -6,8 +6,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 import SideBar from "../SideBar/SideBar";
-import { onMessage } from "firebase/messaging";
-import { Toaster } from "react-hot-toast";
 import { ToastContainer, toast } from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 

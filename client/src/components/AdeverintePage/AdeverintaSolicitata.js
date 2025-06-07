@@ -3,8 +3,6 @@ import { useParams } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 import SideBar from "../SideBar/SideBar";
-import { onMessage } from "firebase/messaging";
-import { Toaster } from "react-hot-toast";
 import { ToastContainer, toast } from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
@@ -20,6 +18,7 @@ const AdeverintaSolicitata = () => {
     try {
       const res = await axiosPrivate.get(`/adeverinte/${id}`);
       setAdeverinta(res.data);
+      //console.log(res.data);
     } catch (err) {
       console.error("Eroare la preluarea adeverintei:", err);
     }
@@ -54,7 +53,7 @@ const AdeverintaSolicitata = () => {
         <div>
           <div>
             Notification sent
-          </div> 
+          </div>
         </div>,
         { position: 'top-right' }
       )
@@ -77,26 +76,28 @@ const AdeverintaSolicitata = () => {
         throw new Error("Nu s-au primit date de la server");
       }
 
+      let filename = "adeverinta.pdf"; // fallback
       const disposition = res.headers["content-disposition"];
-      let filename;
+      console.log("Filename", disposition);
+      console.log(res.headers["content-disposition"]);
 
-      if (disposition) {
-        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-        const matches = filenameRegex.exec(disposition);
-        if (matches != null && matches[1]) {
-          filename = matches[1].replace(/['"]/g, "");
+      if (disposition && disposition.includes("filename=")) {
+        const filenameMatch = disposition.match(/filename\*?=(?:UTF-8'')?["']?([^"';\n]*)["']?/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = decodeURIComponent(filenameMatch[1]);
         }
       }
 
+
       const blob = new Blob([res.data], {
-        type: res.headers["content-type"] || "application/octet-stream",
+        type: res.headers["content-type"] || "application/pdf",
       });
 
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.style.display = "none";
       a.href = url;
-      a.download = filename;
+      a.download = adeverinta.filename;
 
       document.body.appendChild(a);
       a.click();
@@ -131,16 +132,14 @@ const AdeverintaSolicitata = () => {
                 <strong>Status:</strong> {adeverinta.status}
               </p>
 
-              {adeverinta.status === "Aprobata" && (
-                <div>
-                  <p>
-                    <strong>Se poate descarca</strong>
-                  </p>
-                  <button onClick={() => handleDownloadAdeverinta()}>
-                    Descarca adeverinta
-                  </button>
-                </div>
-              )}
+              <div>
+                <p>
+                  <strong>Se poate descarca</strong>
+                </p>
+                <button onClick={() => handleDownloadAdeverinta()}>
+                  Descarca adeverinta
+                </button>
+              </div>
             </>
           ) : (
             <p>Nu exista detalii pentru aceasta deverinta</p>

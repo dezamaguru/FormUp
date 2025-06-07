@@ -1,6 +1,8 @@
 const { Solicitari_Adeverinte, Users } = require('../models');
 const NotificationService = require("../service/NotificationService");
 const EmailService = require("../service/EmailService");
+const { generatePDFBuffer } = require("../service/GeneratePDFService");
+const path = require("path");
 
 const getAllAdeverinte = async (req, res) => {
     try {
@@ -47,20 +49,13 @@ const getAllAdeverinte = async (req, res) => {
 const adaugaSolicitare = async (req, res) => {
 
     try {
-        const { name, tipAdeverinta } = req.body;
+        const { tipAdeverinta } = req.body;
 
-        if (!name || !tipAdeverinta) {
+        if (!tipAdeverinta) {
             return res.status(400).json({
                 message: "Numele și tipul adeverinței sunt obligatorii!"
             });
         }
-
-        const newAdeverinta = await Solicitari_Adeverinte.create({
-            tip_adeverinta: tipAdeverinta,
-            userId: req.userId,
-            nume_student: name,
-            status: "Trimisa",
-        });
 
         const student = await Users.findByPk(req.userId);
 
@@ -79,7 +74,7 @@ const adaugaSolicitare = async (req, res) => {
                 return NotificationService.sendNotification(
                     sec.fcmToken,
                     "Solicitare nouă de adeverință",
-                    `Studentul ${name} a trimis o cerere pentru ${tipAdeverinta}`
+                    `Studentul ${student.lastName} ${student.firstName} a trimis o cerere pentru ${tipAdeverinta}`
                 );
             }
         }));
@@ -90,16 +85,60 @@ const adaugaSolicitare = async (req, res) => {
                 return EmailService.sendEmail({
                     to: sec.email,
                     subject: "Solicitare nouă de adeverință",
-                    text: `Studentul ${name} a trimis o cerere pentru adeverința: ${tipAdeverinta}`,
-                    html: `<p>Studentul <strong>${name}</strong> a trimis o cerere pentru adeverința: <strong>${tipAdeverinta}</strong>.</p>`,
+                    text: `Studentul ${student.lastName} ${student.firstName} a trimis o cerere pentru adeverința: ${tipAdeverinta}`,
+                    html: `<p>Studentul <strong>${student.lastName} ${student.firstName}</strong> a trimis o cerere pentru adeverința: <strong>${tipAdeverinta}</strong>.</p>`,
                 });
             }
         }));
 
+        //generare pdf
+        const formaInvatamantText = student.forma_invatamant === "IF"
+            ? "CU FRECVENȚĂ"
+            : "LA DISTANȚĂ";
+
+        // Construiește datele pentru template
+        const pdfData = {
+            nume: `${student.lastName} ${student.firstName}`,
+            data_nasterii: "05 ianuarie 2003", // adaugă câmp real dacă ai
+            an_universitar: "2024–2025", // hardcodat sau calculat
+            ciclu: `${student.program_studiu}`,
+            an_studiu: student.an_studiu,
+            forma_finantare: student.forma_finantare,
+            motiv: tipAdeverinta,
+            program_studiu: student.program_studiu,
+            domeniu: "CIBERNETICĂ, STATISTICĂ ȘI INFORMATICĂ ECONOMICĂ",
+            forma_invatamant: formaInvatamantText,
+            limba: "Română",
+            locatie: "București",
+            nr_adeverinta: Math.floor(1000 + Math.random() * 9000),
+            data_emitere: new Date().toLocaleDateString("ro-RO"),
+        };
+
+        // Generează PDF din template
+        //const pdfBuffer = await generatePDFBuffer("adeverinta", pdfData);
+        const raw = await generatePDFBuffer("adeverinta", pdfData, true);
+        const pdfBuffer = Buffer.from(raw); // forțează conversia
+
+        // Salvează în baza de date
+        const newAdeverinta = await Solicitari_Adeverinte.create({
+            tip_adeverinta: tipAdeverinta,
+            userId: req.userId,
+            nume_student: `${student.lastName} ${student.firstName}`,
+            status: "Aprobata",
+            filename: `adeverinta_${student.lastName}_${student.firstName}.pdf`,
+            mime_type: "application/pdf",
+            file_data: pdfBuffer,
+        });
+
+        // console.log("TIP:", typeof pdfBuffer);                 // trebuie să fie 'object'
+        // console.log("INSTANȚĂ:", pdfBuffer instanceof Buffer); // trebuie să fie true
+        // console.log("IS BUFFER:", Buffer.isBuffer(pdfBuffer)); // true
+
         res.status(201).json({
             message: "Adeverință adăugată cu succes!",
-            adeverinta: newAdeverinta
+            //adeverinta: newAdeverinta
         });
+
     } catch (err) {
         console.error('Eroare la adaugaSolicitare:', err);
         res.status(500).json({
@@ -231,7 +270,7 @@ const downloadAdeverintaSolicitata = async (req, res) => {
     try {
         const adeverinta = await Solicitari_Adeverinte.findByPk(req.params.id,
             {
-                attributes: ['tip_adeverinta', 'mime_type', 'file_data'],
+                attributes: ['tip_adeverinta', 'mime_type', 'file_data', 'filename'], //
             }
         );
 
@@ -243,18 +282,13 @@ const downloadAdeverintaSolicitata = async (req, res) => {
             return res.status(404).json({ message: "Continutul adeverintei lipseste" });
         }
 
-        // Adaugă extensia fișierului dacă lipsește
-        let filename = adeverinta.tip_adeverinta;
-        if (!filename.endsWith('.pdf')) {
-            filename += '.pdf'; // Presupunem că fișierul este PDF
-        }
-
-        // Escapăm caracterele speciale
+        let filename = adeverinta.filename;
         filename = filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+
 
         // Modificăm modul în care setăm numele fișierului în header
         res.setHeader('Content-Type', adeverinta.mime_type || 'application/octet-stream');
-        res.setHeader('Content-Disposition', `attachment; filename="${adeverinta.tip_adeverinta}"`);
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         res.setHeader('Content-Length', adeverinta.file_data.length);
 
         res.send(adeverinta.file_data);

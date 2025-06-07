@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState } from 'react';
 import './AddAdeverinta.css';
 import { axiosPrivate } from '../../api/axios';
@@ -10,11 +9,6 @@ const AddAdeverinta = ({ onAdd }) => {
   useFirebaseNotifications();
   const [name, setName] = useState('');
   const [tipAdeverinta, setTipAdeverinta] = useState('');
-
-  const [fcmToken, setFcmToken] = useState("");
-  const [title, setTile] = useState("");
-  const [body, setBody] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,8 +67,6 @@ const AddAdeverinta = ({ onAdd }) => {
       }
     } catch (err) {
       console.error("Error at sending notification:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -91,20 +83,20 @@ const AddAdeverinta = ({ onAdd }) => {
             className="form-select"
           >
             <option value="" disabled hidden>Alege tipul adeverinței</option>
-            <option value="adeverinta1">Agenția Județeană Pentru Inspecția Socială</option>
-            <option value="adeverinta2">Casa de Pensii</option>
-            <option value="adeverinta3">CNAS</option>
-            <option value="adeverinta3">D.G.A.S.P.C.</option>
-            <option value="adeverinta3">Locul de muncă</option>
-            <option value="adeverinta3">Locul de muncă al părintelui</option>
-            <option value="adeverinta3">Medicul de familie</option>
-            <option value="adeverinta3">Practică</option>
-            <option value="adeverinta3">Primărie</option>
-            <option value="adeverinta3">Servicul de cazare studenți - Direcția Socială</option>
-            <option value="adeverinta3">Spital</option>
-            <option value="adeverinta3">Transport</option>
-            <option value="adeverinta3">Tribunal</option>
-            <option value="adeverinta3">Work and Travel</option>
+            <option value="Agenția Județeană Pentru Inspecția Socială">Agenția Județeană Pentru Inspecția Socială</option>
+            <option value="Casa de Pensii">Casa de Pensii</option>
+            <option value="CNAS">CNAS</option>
+            <option value="D.G.A.S.P.C.">D.G.A.S.P.C.</option>
+            <option value="Locul de muncă">Locul de muncă</option>
+            <option value="Locul de muncă al părintelui">Locul de muncă al părintelui</option>
+            <option value="Medicul de familie">Medicul de familie</option>
+            <option value="Practică">Practică</option>
+            <option value="Primărie">Primărie</option>
+            <option value="Servicul de cazare studenți - Direcția Socială">Servicul de cazare studenți - Direcția Socială</option>
+            <option value="Spital">Spital</option>
+            <option value="Transport">Transport</option>
+            <option value="Tribunal">Tribunal</option>
+            <option value="Work and Travel">Work and Travel</option>
           </select>
         </div>
 

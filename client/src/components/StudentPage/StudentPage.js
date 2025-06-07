@@ -1,9 +1,7 @@
 import './StudentPage.css';
 import SideBar from '../SideBar/SideBar';
 import { useEffect, useState } from 'react';
-import { generateToken, messaging, onMessageListener } from "../Notificari/firebase";
-import { onMessage } from "firebase/messaging";
-import { Toaster } from "react-hot-toast";
+import { generateToken} from "../Notificari/firebase";
 import { ToastContainer, toast } from 'react-toastify';
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
@@ -12,9 +10,6 @@ function StudentPage() {
   useFirebaseNotifications();
   const axiosPrivate = useAxiosPrivate();
   const [fcmToken, setFcmToken] = useState("");
-  const [title, setTile] = useState("");
-  const [body, setBody] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const fetchFcmToken = async () => {
     try {
@@ -38,7 +33,6 @@ function StudentPage() {
   }, []);
 
   const handlePushNotification = async () => {
-    setLoading(true);
     try {
       var data = {
         title: "Test",
