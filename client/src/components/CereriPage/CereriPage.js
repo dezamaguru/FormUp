@@ -106,12 +106,12 @@ function Cereri() {
   };
 
   return (
-    <div className="student-page">
+    <div className="cereri-page">
       <ToastContainer />
       <SideBar />
 
       {/* Main Content */}
-      <main className="main-content">
+      <main className="main-content-cereri">
         {/* Top bar */}
         <header className="header">
           <h1>Welcome!</h1>
@@ -172,6 +172,7 @@ function Cereri() {
                   setPage(0);
                 }}
               />
+
             </section>
           </div>
         )}

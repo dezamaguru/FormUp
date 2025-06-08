@@ -1,16 +1,46 @@
+.cereri-page {
+  display: flex;
+  min-height: 100vh;
+  text-align: center;
+}
+
+.main-content-cereri {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 12rem;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
 .dashboard-cereri {
   display: grid;
   grid-template-areas:
     "cereri istoric istoric";
   grid-template-columns: 1fr 1fr 2fr;
   gap: 1.5rem;
-  
+  max-height: 65vh;
+  /* limitează înălțimea totală */
+  overflow: hidden;
+  /* evită scroll global */
 }
 
 /* Card style */
 .card-cereri {
+  background: transparent;
   border-radius: 20px;
   padding: 1.5rem;
+  max-height: 80vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
 }
 
 .card-cereri-istoric {
@@ -18,6 +48,13 @@
   border-radius: 20px;
   padding: 1.5rem;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.card-cereri{
+  overflow-y: auto;
+  max-height: 65vh;
+  padding: 1.5rem;
+  border-radius: 20px;
 }
 
 /* Cereri */
@@ -67,23 +104,13 @@
   background-color: #e2e8f0;
 }
 
-.card-upload-cerere{
+.card-upload-cerere {
   background: white;
   margin-top: 1rem;
   padding: 1rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   text-align: center;
-}
-
-.card-cereri {
-  background: transparent;
-  border-radius: 20px;
-  padding: 1.5rem;
-  max-height: 80vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
 }
 
 .card-cereri::-webkit-scrollbar {
@@ -94,4 +121,3 @@
   background-color: #cbd5e1;
   border-radius: 10px;
 }
-
