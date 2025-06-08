@@ -1,10 +1,11 @@
 import './SecretarPage.css';
 import SideBar from "../SideBar/SideBar";
-import { generateToken} from "../Notificari/firebase";
+import { generateToken } from "../Notificari/firebase";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
+import Map from '../Maps/GoogleMaps';
 
 function SecretarRole() {
   useFirebaseNotifications();
@@ -107,6 +108,10 @@ function SecretarRole() {
                 onClick={handlePushNotification}
               >Send</button>
             </div>
+          </section>
+
+          <section>
+            <Map />
           </section>
         </div>
       </main>

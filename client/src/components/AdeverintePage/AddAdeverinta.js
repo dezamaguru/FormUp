@@ -7,25 +7,24 @@ import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 const AddAdeverinta = ({ onAdd }) => {
   useFirebaseNotifications();
-  const [name, setName] = useState('');
+  //const [name, setName] = useState('');
   const [tipAdeverinta, setTipAdeverinta] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !tipAdeverinta) {
+    if (!tipAdeverinta) {
       alert('Te rugăm să completezi toate câmpurile!');
       return;
     }
 
     try {
       const res = await axiosPrivate.post('/adeverinte/upload', {
-        name,
         tipAdeverinta
       });
 
       console.log("Adeverinta :", res.data);
-      setName('');
+      // setName('');
       setTipAdeverinta('');
 
       if (onAdd) onAdd();
@@ -101,7 +100,7 @@ const AddAdeverinta = ({ onAdd }) => {
         </div>
 
         <div className="form-grid">
-          <div className="form-group">
+          {/* <div className="form-group">
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -109,10 +108,10 @@ const AddAdeverinta = ({ onAdd }) => {
               placeholder="Nume complet student"
               required
             />
-          </div>
+          </div> */}
 
-          {/*
-          <div className="form-group">
+          
+          {/* <div className="form-group">
             <input id="email" type="email" placeholder="Email student" />
           </div>
 

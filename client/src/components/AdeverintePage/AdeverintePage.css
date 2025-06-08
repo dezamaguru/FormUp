@@ -1,46 +1,136 @@
 .section-title {
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
+  font-weight: bold;
+  font-size: 1.4rem;
+
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.history-card {
+  width: 100%;
+  max-width: 600px;
+  background-color: #ffffff;
+  padding: 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+  text-align: center;
+}
+
+.history-card:hover {
+  background-color: #f1f5f9;
+  transform: translateY(-2px);
+}
+
+.history-card strong {
+  font-size: 1.1rem;
+  color: #1e293b;
+}
+
+.history-card p {
+  margin: 0.2rem 0;
+  color: #334155;
+}
+
+.history-card small {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* .page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+} */
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 2rem;
+  padding: 2rem;
+  overflow-x: hidden;
+}
+
+.adeverinta-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 2rem;
+  margin-top: 2rem;
+  padding: 0 2rem;
+}
+
+@media (max-width: 900px) {
+  .adeverinta-layout {
+    grid-template-columns: 1fr;
   }
-  
-  .history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center; 
-  }
-  
-  .history-card {
-    width: 60%; 
-    max-width: 600px;
-    background-color: #ffffff;
-    padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    cursor: pointer;
-    transition: background 0.3s ease;
-    text-align: center;
-  }
-  
-  
-  .history-card:hover {
-    background-color: #e2e8f0;
-  }
-  
-  .history-card strong {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 1rem;
-  }
-  
-  .history-card p {
-    margin: 0.2rem 0;
-    color: #334155;
-  }
-  
-  .history-card small {
-    font-size: 0.8rem;
-    color: #64748b;
-  }
-  
+}
+
+.detalii-adeverinta-container,
+.previz-pdf-container {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  min-height: 200px;
+}
+
+.detalii-adeverinta-container {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.detalii-adeverinta-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #1e293b;
+}
+
+.detalii-adeverinta-container p {
+  font-size: 1rem;
+  color: #334155;
+  margin-bottom: 0.6rem;
+  line-height: 1.4;
+}
+
+.detalii-adeverinta-container strong {
+  color: #0f172a;
+}
+
+.detalii-adeverinta-container button {
+  margin-top: 1rem;
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.detalii-adeverinta-container button:hover {
+  background-color: #2563eb;
+}
+
+.detalii-adeverinta-container form {
+  margin-top: 1rem;
+}
+
+.detalii-adeverinta-container input[type="file"] {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}

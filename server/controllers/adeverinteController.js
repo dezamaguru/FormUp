@@ -2,20 +2,25 @@ const { Solicitari_Adeverinte, Users } = require('../models');
 const NotificationService = require("../service/NotificationService");
 const EmailService = require("../service/EmailService");
 const { generatePDFBuffer } = require("../service/GeneratePDFService");
-const path = require("path");
+// const path = require("path");
+// const { off } = require('process');
 
 const getAllAdeverinte = async (req, res) => {
     try {
-        if (req.type === 'student') {
-            const adeverinte = await Solicitari_Adeverinte.findAll({
-                attributes: ['id_adeverinta', 'tip_adeverinta', 'userId', 'nume_student', 'status'],
-                where: {
-                    userId: req.userId,
-                }
-            });
+        const page = parseInt(req.query.pageNumber) || 0;
+        const pageSize = parseInt(req.query.pageSize) || 5;
+        const offset = page * pageSize;
+        const limit = pageSize;
 
-            //console.log('Adeverințe preluate:', adeverinte); 
-            res.json(adeverinte);
+        if (req.type === 'student') {
+            const { rows: adeverinte, count } = await Solicitari_Adeverinte.findAndCountAll({
+                attributes: ['id_adeverinta', 'tip_adeverinta', 'userId', 'nume_student', 'status'],
+                where: { userId: req.userId },
+                offset,
+                limit,
+                order: [['createdAt', 'DESC']]
+            });
+            return res.status(200).json({ data: adeverinte, count });
         }
 
         if (req.type === 'secretar') {
@@ -23,8 +28,7 @@ const getAllAdeverinte = async (req, res) => {
             if (!secretar) {
                 return res.status(404).json({ message: "Profilul secretarului nu a fost găsit" });
             }
-
-            const adeverinte = await Solicitari_Adeverinte.findAll({
+            const { rows: adeverinte, count } = await Solicitari_Adeverinte.findAndCountAll({
                 attributes: ['id_adeverinta', 'tip_adeverinta', 'userId', 'nume_student', 'status'],
                 include: {
                     model: Users,
@@ -34,11 +38,12 @@ const getAllAdeverinte = async (req, res) => {
                         an_studiu: secretar.an_studiu,
                         type: 'student'
                     }
-                }
+                },
+                offset,
+                limit,
+                order: [['createdAt', 'DESC']]
             });
-
-            //console.log('Adeverințe preluate:', adeverinte); 
-            res.json(adeverinte);
+            return res.status(200).json({ data: adeverinte, count });
         }
     } catch (err) {
         console.error('Eroare la getAllAdeverinte:', err);
@@ -301,6 +306,6 @@ const downloadAdeverintaSolicitata = async (req, res) => {
 
 module.exports = {
     adaugaSolicitare, getAllAdeverinte, getOneAdeverinta,
-    uploadAdeverintaSolicitata, downloadAdeverintaSolicitata, 
+    uploadAdeverintaSolicitata, downloadAdeverintaSolicitata,
     updateStatusAdeverinta
 };

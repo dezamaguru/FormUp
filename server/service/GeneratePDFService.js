@@ -50,9 +50,9 @@ const generatePDFBuffer = async (templateName, data, saveLocal = false) => {
 
     await browser.close();
 
-    if (filePath) {
-        console.log("PDF salvat local la:", filePath);
-    }
+    // if (filePath) {
+    //     console.log("PDF salvat local la:", filePath);
+    // }
 
     return buffer;
 };

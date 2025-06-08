@@ -6,8 +6,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 import SideBar from "../SideBar/SideBar";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
+import Paginator from "../Paginator/Paginator";
 
 function AdeverintePage() {
   useFirebaseNotifications();
@@ -17,17 +18,22 @@ function AdeverintePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(3);
+  const [totalCount, setTotalCount] = useState(0);
+
 
   const getAdeverinte = async (
     controller = new AbortController(),
     isMounted = true
   ) => {
     try {
-      const response = await axiosPrivate.get("/adeverinte", {
+      const response = await axiosPrivate.get(`/adeverinte?pageNumber=${page}&pageSize=${pageSize}`, {
         signal: controller.signal,
       });
       if (isMounted) {
-        setAdeverinte(response.data);
+        setAdeverinte(response.data.data);
+        setTotalCount(response.data.count);
       }
     } catch (error) {
       if (error.name === "CanceledError") {
@@ -49,22 +55,22 @@ function AdeverintePage() {
       isMounted = false;
       controller.abort();
     };
-  }, [axiosPrivate, navigate, location]);
+  }, [axiosPrivate, navigate, location, page, pageSize]);
 
   const handleClick = (id, currentStatus) => {
-    navigate(`/adeverinte/${id}`); // navigheaza catre adeverinta solicitata
+    navigate(`/adeverinte/${id}`);
 
-    if (currentStatus === "Procesare" || currentStatus === "Aprobata") {
-      console.log("Statusul nu poate fi schimbat deoarece este deja:", currentStatus);
-      return;
-    }
+    // if (currentStatus === "Procesare" || currentStatus === "Aprobata") {
+    //   console.log("Statusul nu poate fi schimbat deoarece este deja:", currentStatus);
+    //   return;
+    // }
 
-    try {
-      const res = axiosPrivate.post(`/adeverinte/${id}/status`);
-      console.log("Status actualizat:", res.data);
-    } catch (err) {
-      console.error("Eroare la actualizarea statusului:", err);
-    }
+    // try {
+    //   const res = axiosPrivate.post(`/adeverinte/${id}/status`);
+    //   console.log("Status actualizat:", res.data);
+    // } catch (err) {
+    //   console.error("Eroare la actualizarea statusului:", err);
+    // }
   };
 
   return (
@@ -93,8 +99,9 @@ function AdeverintePage() {
             </button>
             {showDropDown && <AddAdeverinta onAdd={getAdeverinte} />}
 
-            <p className="section-title">Istoric solicitări</p>
+
             <div className="history-list">
+              <p className="section-title">Istoric solicitări</p>
               {Array.isArray(adeverinte) && adeverinte.length > 0 ? (
                 adeverinte.map((adeverinta) => (
                   <div
@@ -111,6 +118,14 @@ function AdeverintePage() {
                 <p>Nu există solicitări pentru adeverințe.</p>
               )}
             </div>
+
+            <Paginator
+              page={page}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+              totalRecords={totalCount}
+            />
           </div>
         )}
 
@@ -119,7 +134,8 @@ function AdeverintePage() {
             <p className="section-title">Solicitari adeverinte</p>
 
             <div className="history-list">
-              {Array.isArray(adeverinte) && adeverinte.length > 0 ? (adeverinte.map((adeverinta) => (
+              {Array.isArray(adeverinte) && adeverinte.length > 0 ? 
+              (adeverinte.map((adeverinta) => (
                 <div
                   key={adeverinta.id_adeverinta}
                   className="history-card"
@@ -134,6 +150,13 @@ function AdeverintePage() {
                 <p>Nu exista solicitari pentru adeverinte.</p>
               )}
             </div>
+            <Paginator
+              page={page}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+              totalRecords={totalCount}
+            />
           </div>
         )}
       </main>

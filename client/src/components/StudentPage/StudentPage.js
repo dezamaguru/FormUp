@@ -1,7 +1,7 @@
 import './StudentPage.css';
 import SideBar from '../SideBar/SideBar';
 import { useEffect, useState } from 'react';
-import { generateToken} from "../Notificari/firebase";
+import { generateToken } from "../Notificari/firebase";
 import { ToastContainer, toast } from 'react-toastify';
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
@@ -16,10 +16,10 @@ function StudentPage() {
     try {
       const token = await generateToken();
       console.log("Token FCM generat:", token);
-    
+
       const response = await axiosPrivate.post('/users/fcm-token', { token });
       console.log("Răspuns la salvarea token-ului:", response.data);
-      
+
       setFcmToken(token);
     } catch (err) {
       console.error("Eroare la generarea/salvarea token-ului FCM:", err);
@@ -108,18 +108,19 @@ function StudentPage() {
 
           {/* News */}
           <section className="card news" style={{ gridArea: "news" }}>
-            <h3>News & Updates</h3>
+            {/* <h3>News & Updates</h3>
             <div className="news-box">
               <p>Universities to announce exams</p>
               <button className="read-more"
                 onClick={handlePushNotification}
               >Send</button>
-            </div>
+            </div> */}
+            <Map />
           </section>
 
-          <section>
-            <Map/>
-          </section>
+          {/* <section>
+            <Map />
+          </section> */}
         </div>
       </main>
     </div>

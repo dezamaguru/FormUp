@@ -4,10 +4,9 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useNavigate, useLocation } from "react-router-dom";
 import SideBar from "../SideBar/SideBar";
 import useAuth from "../../hooks/useAuth";
-import { onMessage } from "firebase/messaging";
-import { Toaster } from "react-hot-toast";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
+import Paginator from "../Paginator/Paginator";
 
 function Cereri() {
   useFirebaseNotifications();
@@ -20,6 +19,9 @@ function Cereri() {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(4);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -45,23 +47,24 @@ function Cereri() {
 
     const getSolicitari = async () => {
       try {
-        const res = await axiosPrivate.get("/solicitari", {
+        const res = await axiosPrivate.get(`/solicitari?page=${page}&pageSize=${pageSize}`, {
           signal: controller.signal,
         });
 
         if (isMounted) {
-          console.log("Solicitari primite:", res.data);
-          setSolicitari(res.data);
+          setSolicitari(res.data.solicitari || []);
+          setTotalCount(res.data.total || 0);
         }
       } catch (err) {
         if (err.name === "CanceledError") {
           console.log("Request canceled:", err.message);
         } else {
-          console.error(err.res.data);
+          console.error(err.response?.data);
           navigate("/", { state: { from: location }, replace: true });
         }
       }
-    }
+    };
+
 
     getCereri();
     getSolicitari();
@@ -70,7 +73,7 @@ function Cereri() {
       isMounted = false;
       controller.abort();
     };
-  }, [axiosPrivate, navigate, location]);
+  }, [axiosPrivate, navigate, location, page, pageSize]);
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -89,10 +92,8 @@ function Cereri() {
         },
       });
 
-      // Adăugăm noua cerere direct în state
       setCereri((prev) => [...prev, res.data.cerere]);
 
-      // Resetăm formularul
       setTitle("");
       setType("");
       setFile(null);
@@ -106,7 +107,7 @@ function Cereri() {
 
   return (
     <div className="student-page">
-      <ToastContainer/>
+      <ToastContainer />
       <SideBar />
 
       {/* Main Content */}
@@ -160,6 +161,17 @@ function Cereri() {
               ) : (
                 <p>Nu exista solicitari</p>
               )}
+
+              <Paginator
+                page={page}
+                pageSize={pageSize}
+                totalRecords={totalCount}
+                onPageChange={setPage}
+                onPageSizeChange={(newSize) => {
+                  setPageSize(Number(newSize));
+                  setPage(0);
+                }}
+              />
             </section>
           </div>
         )}
@@ -231,6 +243,17 @@ function Cereri() {
               ) : (
                 <p>Nu există cereri disponibile.</p>
               )}
+
+              <Paginator
+                page={page}
+                pageSize={pageSize}
+                totalRecords={totalCount}
+                onPageChange={setPage}
+                onPageSizeChange={(newSize) => {
+                  setPageSize(Number(newSize));
+                  setPage(0);
+                }}
+              />
             </section>
           </div>
         )}

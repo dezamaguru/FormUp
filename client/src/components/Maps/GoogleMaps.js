@@ -17,14 +17,14 @@ function Map() {
 
     const initMap = () => {
       const map = new window.google.maps.Map(document.getElementById("map"), {
-        center: { lat: 45.9432, lng: 24.9668 }, // Centru Romania
-        zoom: 6,
+        center: { lat: 44.44762, lng: 26.0979 }, 
+        zoom: 15,
         mapTypeId: "roadmap",
       });
 
       const institutii = [
         {
-          lat: 44.435, lng: 26.102,
+          lat: 44.44762, lng: 26.0979,
           nume: "ASE București",
           descriere: "Academia de Studii Economice din București"
         },

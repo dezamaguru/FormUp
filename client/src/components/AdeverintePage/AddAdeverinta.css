@@ -58,17 +58,17 @@
 }
 
 .submit-btn {
-  display: inline-flex;
-  align-items: center;
-  background-color: #67a5f8;
+  background: #3b82f6;
   color: white;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
+  padding: 0.7rem 1.2rem;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 1rem;
+  margin-bottom: 1rem;
+  transition: background 0.3s ease;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .submit-btn:hover {

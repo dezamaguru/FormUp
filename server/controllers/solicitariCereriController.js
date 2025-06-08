@@ -10,9 +10,9 @@ const uploadSolicitareCerere = async (req, res) => {
         const id_cerere = req.params.id;
         const file = req.file;
 
-        console.log("ID cerere:", id_cerere);
-        console.log("ID utilizator:", req.userId);
-        console.log("Fișier:", file);
+        // console.log("ID cerere:", id_cerere);
+        // console.log("ID utilizator:", req.userId);
+        // console.log("Fișier:", file);
 
         if (!file) {
             return res.status(400).json({ message: "Fisierul nu a fost incarcat!" });
@@ -94,16 +94,25 @@ const uploadSolicitareCerere = async (req, res) => {
 
 const getAllSolicitariCereri = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 0;
+        const pageSize = parseInt(req.query.pageSize) || 5;
+
+        const limit = pageSize;
+        const offset = page * pageSize;
+
         if (req.type === 'student') {
-            const solicitari = await Solicitari_Cereri.findAll({
+            const { count, rows } = await Solicitari_Cereri.findAndCountAll({
                 attributes: ["id_solicitare", "id_cerere", "userId", "status"],
                 where: {
                     userId: req.userId,
-                }
+                },
+                order: [['createdAt', 'DESC']],
+                limit,
+                offset,
+                order: [['createdAt', 'DESC']]
             });
 
-            console.log("Solicitari preluate: ", solicitari);
-            return res.json(solicitari);
+            return res.json({ solicitari: rows, total: count });
         }
 
         if (req.type === 'secretar') {
@@ -112,7 +121,7 @@ const getAllSolicitariCereri = async (req, res) => {
                 return res.status(404).json({ message: "Profilul secretarului nu a fost gasit" });
             }
 
-            const solicitari = await Solicitari_Cereri.findAll({
+            const { count, rows } = await Solicitari_Cereri.findAndCountAll({
                 attributes: ["id_solicitare", "id_cerere", "userId", "status"],
                 include: {
                     model: Users,
@@ -122,15 +131,18 @@ const getAllSolicitariCereri = async (req, res) => {
                         an_studiu: secretar.an_studiu,
                         type: 'student'
                     }
-                }
+                },
+                order: [['createdAt', 'DESC']],
+                limit,
+                offset,
+                order: [['createdAt', 'DESC']]
             });
 
-            console.log("Solicitari preluate: ", solicitari);
-            return res.json(solicitari);
+            return res.json({ solicitari: rows, total: count });
         }
 
     } catch (err) {
-        console.log("Eroare la  getAllSolicitariCereri: ", err);
+        console.log("Eroare la getAllSolicitariCereri: ", err);
         return res.status(500).json({ message: "Eroare la getAllSolicitariCereri " });
     }
 }

@@ -1,0 +1,36 @@
+.paginator {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.paginator button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s ease;
+  margin: 0.5rem;
+}
+
+.paginator button:hover {
+  background-color: #2563eb;
+}
+
+.page-info {
+  font-weight: bold;
+}
+
+.page-size-label input {
+  padding: 0.4rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  margin-left: 0.5rem;
+  width: 60px;
+}
