@@ -118,7 +118,7 @@ const downloadCerere = async (req, res) => {
   try {
 
     const cerere = await Cereri.findOne({
-      attributes: ['filename', 'mime_type', 'file_data'],
+      attributes: ['title','filename', 'mime_type', 'file_data'],
       where: {
         id_cerere: req.params.id,
       }
@@ -134,7 +134,7 @@ const downloadCerere = async (req, res) => {
 
     // Modificăm modul în care setăm numele fișierului în header
     res.setHeader('Content-Type', cerere.mime_type || 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename="${cerere.filename}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${cerere.title}"`);
     res.setHeader('Content-Length', cerere.file_data.length);
 
     // Trimitem datele

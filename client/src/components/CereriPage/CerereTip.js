@@ -67,7 +67,7 @@ function CerereTip() {
             const a = document.createElement("a");
             a.style.display = "none";
             a.href = url;
-            a.download = filename;
+            a.download = cerereTip.title;
 
             document.body.appendChild(a);
             a.click();
@@ -84,36 +84,36 @@ function CerereTip() {
 
     const handleAddSolicitare = async (id) => {
 
-        if (!file) {
-            return alert("Încarcă fișierul!");
-        }
+        // if (!file) {
+        //     return alert("Încarcă fișierul!");
+        // }
 
-        const formData = new FormData();
-        formData.append("file", file);
+        // const formData = new FormData();
+        // formData.append("file", file);
 
         try {
-            const res = await axiosPrivate.post(`/cereri/${id}/upload`,
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
+            // const res = await axiosPrivate.post(`/cereri/${id}/upload`,
+            //     formData,
+            //     {
+            //         headers: {
+            //             "Content-Type": "multipart/form-data",
+            //         },
+            //     }
+            // );
+
+            const res = await axiosPrivate.post(`/cereri/${id}/upload`);
+            //const solicitare = await axiosPrivate.get(`cereri/solicitari/${id}`);
 
             setFile(null);
             console.log("Solicitare adăugată cu succes!", res.data);
-            
+
             toast.success("Solicitarea a fost trimisă!", {
                 position: "top-right"
             });
-            
-
 
         } catch (err) {
             console.error("Eroare completă:", err);
             console.error("Răspuns server:", err.response?.data);
-            alert(err.response?.data?.message || "Eroare la încărcare");
         }
     }
 
@@ -187,11 +187,13 @@ function CerereTip() {
                                     Descarcă
                                 </button>
 
-                                <form onSubmit={(e) => { e.preventDefault(); handleAddSolicitare(cerereTip.id_cerere) }}>
+                                {/* <form onSubmit={(e) => { e.preventDefault(); handleAddSolicitare(cerereTip.id_cerere) }}>
                                     <input type="file" onChange={(e) => setFile(e.target.files[0])} required />
 
                                     <button type="submit">Incarca cerere</button>
-                                </form>
+                                </form> */}
+
+                                <button onClick={() => handleAddSolicitare(cerereTip.id_cerere)}>Adauga solicitare</button>
 
                             </>
                         ) : (

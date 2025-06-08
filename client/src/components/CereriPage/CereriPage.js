@@ -86,22 +86,16 @@ function Cereri() {
     formData.append("file", file);
 
     try {
-      const res = await axiosPrivate.post("/cereri/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const res = await axiosPrivate.post(`/cereri/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
-
-      setCereri((prev) => [...prev, res.data.cerere]);
-
-      setTitle("");
-      setType("");
-      setFile(null);
-      navigate("/cereri", { state: { from: location }, replace: true });
+      // Navighează către pagina noii solicitări după adăugare cu succes
+      if (res.data && res.data.newSolicitare && res.data.newSolicitare.id_cerere) {
+        navigate(`/cereri/solicitari/${res.data.newSolicitare.id_cerere}`);
+      }
     } catch (err) {
-      console.error("Eroare completă:", err);
-      console.error("Răspuns server:", err.response?.data);
-      alert(err.response?.data?.message || "Eroare la upload");
+      alert("Eroare la încărcare cerere!");
+      console.error(err);
     }
   };
 

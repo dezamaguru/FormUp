@@ -23,6 +23,8 @@ function SolicitareCerere() {
     const [continutModificat, setContinutModificat] = useState("");
     const [observatii, setObservatii] = useState([]);
     const [selectedObservatieId, setSelectedObservatieId] = useState(null);
+    const [files, setFiles] = useState([]);
+    const [documente, setDocumente] = useState([]);
 
     useEffect(() => {
         let isMounted = true;
@@ -33,6 +35,7 @@ function SolicitareCerere() {
                 const response = await axiosPrivate.get(`/cereri/solicitari/${id}`, {
                     signal: controller.signal,
                 });
+
                 if (isMounted) {
                     setSolicitare(response.data);
                 }
@@ -66,6 +69,7 @@ function SolicitareCerere() {
 
         getSolicitare();
         getObservatii();
+        getDocumente(controller.signal);
 
         return () => {
             isMounted = false;
@@ -73,6 +77,19 @@ function SolicitareCerere() {
         };
     }, [axiosPrivate]);
 
+    const getDocumente = async (signal) => {
+        try {
+            const res = await axiosPrivate.get(`/cereri/solicitari/${id}/documente`,
+                signal ? { signal } : undefined)
+            setDocumente(res.data);
+        } catch (err) {
+            if (err.name === "CanceledError") {
+                console.log("Request canceled:", err.message);
+            } else {
+                console.error(err.res?.data);
+            }
+        }
+    }
 
     const handleUploadObservatie = async (e) => {
         e.preventDefault();
@@ -169,6 +186,98 @@ function SolicitareCerere() {
         }
     }
 
+    const handleUploadDocumente = async () => {
+        if (files.length === 0)
+            return alert("Niciun fișier selectat.");
+
+        const formData = new FormData();
+        files.forEach(file => formData.append("files", file));
+
+        try {
+            await axiosPrivate.post(`/cereri/solicitari/${id}/uploadDocumente`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            toast.success("Documentele au fost incarate!", {
+                position: "top-right"
+            });
+
+            setFiles([]); // resetare listă
+            await getDocumente(); // reîncarcă lista documentelor după upload
+        } catch (err) {
+            console.error("Eroare încărcare fișiere:", err);
+            toast.error("Eroare la încărcarea fișierelor.");
+        }
+    }
+
+    const handleDeleteDocument = async (id_document) => {
+
+        try {
+            await axiosPrivate.post(`/cereri/solicitari/${id}/documente/delete`, {
+                id_document: id_document
+            });
+
+            toast.success(
+                <div>
+                    <div>
+                        Document sters!
+                    </div>
+                </div>,
+                { position: 'top-right' }
+            )
+            getDocumente();
+
+        } catch (err) {
+            console.error("Eroare la ștergerea documentului:", err);
+            toast.error("Eroare la ștergere.");
+        }
+
+    }
+
+    const handleDownloadDocument = async (id_document, file_name) => {
+        try {
+            const res = await axiosPrivate.get(
+                `/cereri/solicitari/${id}/documente/download?id_document=${id_document}`,
+                { responseType: "blob" }
+            );
+
+            if (!res.data) {
+                throw new Error("Nu s-au primit date de la server");
+            }
+
+            let filename = "document.pdf"; 
+            const disposition = res.headers["content-disposition"];
+            console.log("Filename", disposition);
+            console.log(res.headers["content-disposition"]);
+
+            if (disposition && disposition.includes("filename=")) {
+                const filenameMatch = disposition.match(/filename\*?=(?:UTF-8'')?["']?([^"';\n]*)["']?/);
+                if (filenameMatch && filenameMatch[1]) {
+                    filename = decodeURIComponent(filenameMatch[1]);
+                }
+            }
+
+            const blob = new Blob([res.data], {
+                type: res.headers["content-type"] || "application/pdf",
+            });
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = file_name;
+
+            document.body.appendChild(a);
+            a.click();
+
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (err) {
+            console.error("Eroare la descarcarea documentului: ", err);
+            toast.error("Eroare la ștergere.");
+        }
+    }
+
     return (
         <div className="student-page">
             <ToastContainer />
@@ -203,6 +312,51 @@ function SolicitareCerere() {
                             ) : (
                                 <p>Nu exista detalii pentru acesta solicitare</p>
                             )}
+
+                            <div
+                                className="dropzone"
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    const droppedFiles = Array.from(e.dataTransfer.files);
+                                    setFiles((prev) => [...prev, ...droppedFiles]);
+                                }}
+                            >
+                                <p>Trage fișiere aici sau folosește butonul de mai jos</p>
+                            </div>
+
+                            <input
+                                type="file"
+                                multiple
+                                onChange={(e) => setFiles((prev) => [...prev, ...Array.from(e.target.files)])}
+                            />
+
+                            <ul>
+                                {files.map((file, index) => (
+                                    <li key={index}>{file.name}</li>
+                                ))}
+                            </ul>
+
+                            <button onClick={handleUploadDocumente}>
+                                Încarcă documente
+                            </button>
+
+                            <section className='documente-container'>
+                                {Array.isArray(documente) && documente.length > 0 ? (
+                                    documente.map((doc) => (
+                                        <div
+                                            key={doc.id_document}
+                                            className='observatie-card'>
+                                            <strong>{doc.file_name}</strong>
+                                            <button onClick={() => handleDeleteDocument(doc.id_document)}>Sterge</button>
+                                            <button onClick={() => handleDownloadDocument(doc.id_document, doc.file_name)}>Descarca</button>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>Nu exista documente pentru aceasta solicitare</p>
+                                )}
+                            </section>
+
                         </section>
 
                         {/* Observatii */}

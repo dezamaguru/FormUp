@@ -66,3 +66,20 @@ button {
 button:hover {
     background: #4a90e2;
 }
+
+.upload-section {
+    margin: 2rem 0;
+    padding: 1rem;
+    border: 2px dashed #94a3b8;
+    border-radius: 12px;
+    background-color: #f8fafc;
+    text-align: center;
+}
+
+.dropzone {
+    padding: 1rem;
+    background: #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
