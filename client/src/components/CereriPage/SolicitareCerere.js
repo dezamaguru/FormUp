@@ -5,8 +5,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import SideBar from "../SideBar/SideBar";
 import { useParams } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import { onMessage } from "firebase/messaging";
-import { Toaster } from "react-hot-toast";
 import { ToastContainer, toast } from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
@@ -43,7 +41,6 @@ function SolicitareCerere() {
                     console.log("Request canceled:", error.message);
                 } else {
                     console.error(error.response.data);
-                    //navigate("/", { state: { from: location }, replace: true });
                 }
             }
         };

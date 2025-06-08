@@ -21,9 +21,6 @@ client.on('error', err => console.log('Redis client Error', err));
   await client.connect();
 })();
 
-// client.set("Web", "Js");
-// console.log(client.get("Web"));
-
 module.exports = client;
 
 //middleware for cookies

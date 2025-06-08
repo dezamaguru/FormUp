@@ -1,47 +1,28 @@
+/* Dashboard solicitare */
 .dashboard-solicitare {
     display: grid;
-    grid-template-areas:
-        "solicitare solicitare observatie"
-        "solicitare solicitare observatie";
+    grid-template-areas: "solicitare solicitare observatie";
     grid-template-columns: 2fr 1fr 1fr;
     gap: 1.5rem;
-    margin-top: 2rem;
+    max-height: 70vh;
+    overflow: hidden;
 }
 
-/* Card style */
-.card-solicitare {
-    background: white;
-  border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
+/* Card general */
+.card-solicitare,
 .card-cereri-observatie {
     background: white;
-  border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+    max-height: 65vh;
 }
 
-/* Cereri */
-.solicitare-card {
-    background: #ffffff;
-    margin-top: 1rem;
-    padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: background 0.3s ease;
-    text-align: center;
-}
-
-.solicitare-card strong {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 1rem;
-}
-
+/* Observatie vizuală */
+.solicitare-card,
 .observatie-card {
-    background: #f1f5f9;
+    background: #f9fafb;
     margin-top: 1rem;
     padding: 1rem;
     border-radius: 12px;
@@ -49,11 +30,39 @@
     text-align: center;
 }
 
-.container-form-observatii{
-    background: #f1f5f9;
+.observatie-card strong {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+/* Form observatii */
+.container-form-observatii {
     margin-top: 1rem;
+    background: #f1f5f9;
     padding: 1rem;
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    text-align: center;
+}
+
+.container-form-observatii input {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0;
+    padding: 0.6rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+button {
+    margin: 0.3rem;
+    padding: 0.5rem 1rem;
+    background: #67a5f8;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #4a90e2;
 }
