@@ -4,6 +4,7 @@ const { Solicitari_Cereri } = require('../models');
 const NotificationService = require("../service/NotificationService");
 const EmailService = require("../service/EmailService");
 const { Documente_Solicitari } = require('../models');
+const { Notificari } = require('../models');
 
 const uploadSolicitareCerere = async (req, res) => {
     try {
@@ -30,6 +31,16 @@ const uploadSolicitareCerere = async (req, res) => {
                 an_studiu: student.an_studiu
             }
         });
+
+        await Promise.all(secretari.map(sec => {
+            return Notificari.create({
+                userId: sec.userId,
+                titlu: "Solicitare nouă de cerere",
+                mesaj: `Studentul ${student.firstName} ${student.lastName} a trimis o solicitare pentru: ${cerere.title}`,
+                link_destinatie: `/cereri/solicitari/${newSolicitare.id_solicitare}`,
+            });
+        }));
+
 
         await Promise.all(secretari.map(sec => {
             const notificare = sec.fcmToken
@@ -107,7 +118,9 @@ const uploadDocumenteSolicitareCerere = async (req, res) => {
                     id_solicitare: solicitare.id_solicitare,
                     file_name: file.originalname,
                     mime_type: file.mimetype,
-                    file_data: file.buffer
+                    file_data: file.buffer,
+                    uploadedBy: req.userId,
+                    destinatar: req.body.destinatar || null
                 })
             )
         );
@@ -154,6 +167,32 @@ const uploadDocumenteSolicitareCerere = async (req, res) => {
             return Promise.all([notificare, email]);
         }));
 
+        const notificariPromises = [];
+        if (req.body.destinatar) {
+            notificariPromises.push(
+                Notificari.create({
+                    userId: req.body.destinatar,
+                    titlu: "Document nou primit de la secretariat",
+                    mesaj: `Ai primit un document nou pentru solicitarea "${cerere.title}".`,
+                    link_destinatie: `/cereri/solicitari/${solicitare.id_solicitare}`
+                })
+            );
+        } else {
+            secretari.forEach(sec => {
+                notificariPromises.push(
+                    Notificari.create({
+                        userId: sec.userId,
+                        titlu: "Document nou încărcat de student",
+                        mesaj: `Studentul ${student.firstName} ${student.lastName} a încărcat un document pentru cererea "${cerere.title}".`,
+                        link_destinatie: `/cereri/solicitari/${solicitare.id_solicitare}`
+                    })
+                );
+            });
+        }
+
+        await Promise.all(notificariPromises);
+
+
         res.status(201).json({
             message: "Documentele au fost salvate cu succes!",
             newSolicitare: {
@@ -162,28 +201,29 @@ const uploadDocumenteSolicitareCerere = async (req, res) => {
             documente: documente.map(doc => ({ file_name: doc.file_name }))
         });
 
+
+
     } catch (err) {
         console.error('Eroare uploadDocumenteSolicitareCerere:', err);
         res.status(500).json({ message: "Eroare la încărcarea fișierelor", error: err.message });
     }
 };
 
-
 const getAllDocumente = async (req, res) => {
     try {
-        const documente = await Documente_Solicitari.findAll({
-            where: {
-                id_solicitare: req.params.id,
-            }
-        })
+        const { id } = req.params; // id_solicitare
 
-        console.log("Documente gasite: ", documente);
+        const documente = await Documente_Solicitari.findAll({
+            where: { id_solicitare: id },
+            attributes: ["id_document", "id_solicitare", "file_name", "uploadedBy", "destinatar"],
+        });
+
         res.json(documente);
     } catch (err) {
         console.log("Eroare la getAllDocumente: ", err);
         res.status(500).json({ err: err.message });
     }
-}
+};
 
 const deleteDocument = async (req, res) => {
     try {
@@ -269,7 +309,7 @@ const getOneSolicitare = async (req, res) => {
             where: { id_solicitare: req.params.id },
             include: [
                 { model: Cereri, attributes: ['title'] },
-                { model: Users, attributes: ['firstName', 'lastName'] }
+                { model: Users, attributes: ['userId', 'firstName', 'lastName'] }
             ]
         });
 
@@ -294,18 +334,24 @@ const updateStatusSolicitare = async (req, res) => {
                 }
             }
         );
-        console.log("Status solictare modificat cu succes!")
 
-        const solicitare = await Solicitari_Cereri.findByPk(req.params.id);
+        const solicitare = await Solicitari_Cereri.findByPk(req.params.id, {
+            include: [
+                { model: Users, attributes: ['firstName', 'lastName', 'program_studiu', 'an_studiu', 'email', 'fcmToken'] },
+                { model: Cereri, attributes: ['title'] }
+            ]
+
+        });
+        //console.log("Status solictare modificat cu succes!")
         const student = await Users.findByPk(solicitare.userId);
+        const cerere = solicitare.Cereri;
 
-        if (student.fcmToken) {
-            return NotificationService.sendNotification(
-                student.fcmToken,
-                "Status solicitare modificat",
-                `Solicitarea ${solicitare.file_name} a fost vizualizata`
-            )
-        }
+        const notif = await Notificari.create({
+            userId: student.userId,
+            titlu: "Status solicitare actualizat",
+            mesaj: `Statusul solicitării tale pentru ${cerere.title} a fost actualizat la: ${statusSolicitare}.`,
+            link_destinatie: `/cereri/solicitari/${solicitare.id_solicitare}`
+        });
 
         // Email
         await EmailService.sendEmail({
@@ -321,6 +367,15 @@ const updateStatusSolicitare = async (req, res) => {
                 <p>Cu stimă,<br/>Echipa FormUp</p>
             `
         });
+
+
+        if (student.fcmToken) {
+            return NotificationService.sendNotification(
+                student.fcmToken,
+                "Status solicitare modificat",
+                `Solicitarea pentru ${cerere.title} a fost vizualizata`
+            )
+        }
 
         res.status(200);
 
@@ -371,5 +426,5 @@ module.exports = {
     uploadDocumenteSolicitareCerere,
     getAllDocumente,
     deleteDocument,
-    downloadDocument
+    downloadDocument,
 }

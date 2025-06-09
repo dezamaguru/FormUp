@@ -2,8 +2,7 @@ const { Solicitari_Adeverinte, Users } = require('../models');
 const NotificationService = require("../service/NotificationService");
 const EmailService = require("../service/EmailService");
 const { generatePDFBuffer } = require("../service/GeneratePDFService");
-// const path = require("path");
-// const { off } = require('process');
+const { Notificari } = require('../models');
 
 const getAllAdeverinte = async (req, res) => {
     try {
@@ -54,6 +53,7 @@ const getAllAdeverinte = async (req, res) => {
 const adaugaSolicitare = async (req, res) => {
 
     try {
+        const { userId } = req;
         const { tipAdeverinta } = req.body;
 
         if (!tipAdeverinta) {
@@ -135,9 +135,16 @@ const adaugaSolicitare = async (req, res) => {
             file_data: pdfBuffer,
         });
 
-        // console.log("TIP:", typeof pdfBuffer);                 // trebuie să fie 'object'
-        // console.log("INSTANȚĂ:", pdfBuffer instanceof Buffer); // trebuie să fie true
-        // console.log("IS BUFFER:", Buffer.isBuffer(pdfBuffer)); // true
+        //creaza notificari
+        await Promise.all(secretari.map(sec => {
+            return Notificari.create({
+                userId: sec.userId,
+                titlu: "Solicitare nouă de adeverință",
+                mesaj: `Studentul ${student.lastName} ${student.firstName} a trimis o cerere pentru ${tipAdeverinta}`,
+                link_destinatie: `/adeverinte/${newAdeverinta.id_adeverinta}`,
+                citita: false
+            });
+        }));
 
         res.status(201).json({
             message: "Adeverință adăugată cu succes!",

@@ -100,10 +100,12 @@ const ForumPage = () => {
                     >
                         <div className="friends-credent">
                             <span className="friends-name">{conversatie.title}</span>
-                            <span className="friends-message">Id: {conversatie.id_conversatie}</span>
-                            <span className="friends-message">UserId: {conversatie.userId}</span>
+                            <span className="friends-message">
+                                <strong>                                {conversatie.User ? `${conversatie.User.firstName} ${conversatie.User.lastName}` : '—'}</strong>
+                            </span>
+                            <span className="friends-message">{conversatie.User?.facultate}</span>
+                            <span className="friends-message">An studiu:{conversatie.User?.an_studiu}</span>
                         </div>
-                        <span className="badge notif-badge">7</span>
                     </div>
                 ))
             ) : (

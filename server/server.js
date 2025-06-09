@@ -40,6 +40,7 @@ app.use('/adeverinte', require('./routes/adeverinteRoute'));
 app.use('/inbox', require('./routes/conversatiiRoute'));
 app.use('/firebase', require('./routes/FirebaseRoute'));
 app.use("/stats", require("./routes/statsRoute"));
+app.use("/notificari", require("./routes/notificariRoute"));
 
 
 db.sequelize.sync().then(() => {

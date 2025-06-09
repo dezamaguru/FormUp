@@ -25,6 +25,18 @@ module.exports = (sequelize, DataTypes) => {
     file_data: {
       type: DataTypes.BLOB('long'),
       allowNull: false,
+    },
+    uploadedBy: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Users',
+        key: 'userId'
+      },
+      onDelete: 'CASCADE'
+    },
+    destinatar:{
+      type: DataTypes.INTEGER
     }
   }, {
     tableName: 'documente_solicitari'

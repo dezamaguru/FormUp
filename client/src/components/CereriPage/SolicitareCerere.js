@@ -192,6 +192,11 @@ function SolicitareCerere() {
         const formData = new FormData();
         files.forEach(file => formData.append("files", file));
 
+        // Dacă secretarul încarcă, adaugă și destinatarul
+        if (auth?.type === 'secretar' && solicitare?.User?.userId) {
+            formData.append("destinatar", solicitare.User.userId);
+        }
+
         try {
             await axiosPrivate.post(`/cereri/solicitari/${id}/uploadDocumente`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -201,8 +206,8 @@ function SolicitareCerere() {
                 position: "top-right"
             });
 
-            setFiles([]); // resetare listă
-            await getDocumente(); // reîncarcă lista documentelor după upload
+            setFiles([]);
+            await getDocumente();
         } catch (err) {
             console.error("Eroare încărcare fișiere:", err);
             toast.error("Eroare la încărcarea fișierelor.");
@@ -340,20 +345,43 @@ function SolicitareCerere() {
                             </section>
 
                             <section className='documente-container' style={{ gridArea: "documente" }}>
-                                {Array.isArray(documente) && documente.length > 0 ? (
-                                    documente.map((doc) => (
-                                        <div
-                                            key={doc.id_document}
-                                            className='observatie-card'>
-                                            <strong>{doc.file_name}</strong>
-                                            <button className="delete-btn" onClick={() => handleDeleteDocument(doc.id_document)}>
-                                                Șterge
-                                            </button>
-                                            <button className="download-btn" onClick={() => handleDownloadDocument(doc.id_document, doc.file_name)}>Descarca</button>
-                                        </div>
-                                    ))
+                                <strong>Documente incarcate</strong>
+                                {Array.isArray(documente) && documente.filter(doc => doc.uploadedBy === solicitare?.User?.userId).length > 0 ? (
+                                    documente
+                                        .filter(doc => doc.uploadedBy === solicitare?.User?.userId)
+                                        .map((doc) => (
+                                            <div key={doc.id_document} className='document-card'>
+                                                <p>{doc.file_name}</p>
+                                                <button className="delete-btn"
+                                                    onClick={() => handleDeleteDocument(doc.id_document)}>
+                                                    Șterge
+                                                </button>
+                                                <button className="download-btn"
+                                                    onClick={() => handleDownloadDocument(doc.id_document, doc.file_name)}>
+                                                    Descarcă
+                                                </button>
+                                            </div>
+                                        ))
                                 ) : (
-                                    <p>Nu exista documente pentru aceasta solicitare</p>
+                                    <p>Nu există documente încărcate de tine pentru această solicitare</p>
+                                )}
+                            </section>
+
+                            <section className='documente-container' style={{ gridArea: "documente2" }}>
+                                <strong>Documente primite de la secretariat</strong>
+                                {documente.filter(doc => doc.destinatar === solicitare?.User?.userId).length > 0 ? (
+                                    documente
+                                        .filter(doc => doc.destinatar === solicitare?.User?.userId)
+                                        .map((doc) => (
+                                            <div key={doc.id_document} className='document-card'>
+                                                <p>{doc.file_name}</p>
+                                                <button className="download-btn"
+                                                    onClick={() => handleDownloadDocument(doc.id_document, doc.file_name)}
+                                                >Descarcă</button>
+                                            </div>
+                                        ))
+                                ) : (
+                                    <p>Nu există documente primite de la secretariat</p>
                                 )}
                             </section>
 
@@ -438,17 +466,42 @@ function SolicitareCerere() {
                             </section>
 
                             <section className='documente-container' style={{ gridArea: "documente" }}>
-                                {Array.isArray(documente) && documente.length > 0 ? (
-                                    documente.map((doc) => (
-                                        <div
-                                            key={doc.id_document}
-                                            className='observatie-card'>
-                                            <strong>{doc.file_name}</strong>
-                                            <button className="download-btn" onClick={() => handleDownloadDocument(doc.id_document, doc.file_name)}>Descarca</button>
-                                        </div>
-                                    ))
+                                <strong>Documente trimise de student</strong>
+                                {documente.filter(doc => doc.uploadedBy === solicitare?.User?.userId).length > 0 ? (
+                                    documente
+                                        .filter(doc => doc.uploadedBy === solicitare?.User?.userId)
+                                        .map((doc) => (
+                                            <div key={doc.id_document} className='document-card'>
+                                                <p>{doc.file_name}</p>
+                                                <button className="download-btn"
+                                                    onClick={() => handleDownloadDocument(doc.id_document, doc.file_name)}
+                                                >Descarcă</button>
+                                            </div>
+                                        ))
                                 ) : (
-                                    <p>Nu exista documente pentru aceasta solicitare</p>
+                                    <p>Nu există documente primite de la secretariat</p>
+                                )}
+                            </section>
+
+                            <section className='documente-container' style={{ gridArea: "documente2" }}>
+                                <strong>Documente incarcate</strong>
+                                {documente.filter(doc => doc.destinatar === solicitare?.User?.userId).length > 0 ? (
+                                    documente
+                                        .filter(doc => doc.destinatar === solicitare?.User?.userId)
+                                        .map((doc) => (
+                                            <div key={doc.id_document} className='document-card'>
+                                                <p>{doc.file_name}</p>
+                                                <button className="delete-btn"
+                                                    onClick={() => handleDeleteDocument(doc.id_document)}>
+                                                    Șterge
+                                                </button>
+                                                <button className="download-btn"
+                                                    onClick={() => handleDownloadDocument(doc.id_document, doc.file_name)}
+                                                >Descarcă</button>
+                                            </div>
+                                        ))
+                                ) : (
+                                    <p>Nu există documente primite de la secretariat</p>
                                 )}
                             </section>
 

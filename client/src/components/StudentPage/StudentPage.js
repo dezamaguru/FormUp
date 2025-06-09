@@ -6,11 +6,14 @@ import { ToastContainer, toast } from 'react-toastify';
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 import Map from '../Maps/GoogleMaps';
+import { useNavigate } from "react-router-dom";
 
 function StudentPage() {
   useFirebaseNotifications();
   const axiosPrivate = useAxiosPrivate();
   const [fcmToken, setFcmToken] = useState("");
+  const [notificari, setNotificari] = useState("");
+  const navigate = useNavigate();
 
   const fetchFcmToken = async () => {
     try {
@@ -29,42 +32,35 @@ function StudentPage() {
     }
   }
 
+  const getNotificari = async () => {
+    try {
+      const notificari = await axiosPrivate.get('/notificari/');
+      setNotificari(notificari.data);
+    } catch (err) {
+      console.error("Error getting notifications: ", err);
+    }
+
+  }
+
   useEffect(() => {
     fetchFcmToken();
+    getNotificari();
   }, []);
 
-  // const handlePushNotification = async () => {
-  //   try {
-  //     var data = {
-  //       title: "Test",
-  //       body: "notificare test de la student",
-  //       deviceToken: "fYLyQN5NAXoaMqPq6x3RjS:APA91bGePzcCGCbzzNIUaayrJEyjndrrEzox9mm6Y8WIgr1bDON7hVENUOowTRCSpFzKBmfkL0xcrPDBpxHLNA4bOr_9Yc1ZzzBsMdwZfWdC2kDh5w9dhI8"
-  //     };
-  //     const response = await axiosPrivate.post('/firebase/send-notification', data);
-  //     console.log(response);
-  //     if (response.status === 200) {
-  //       toast.success(
-  //         <div>
-  //           <div>
-  //             Notification sent
-  //           </div>
-  //         </div>,
-  //         { position: 'top-right' }
-  //       )
-  //     } else {
-  //       toast.error(
-  //         <div>
-  //           <div>
-  //             Failed to send notification
-  //           </div>
-  //         </div>,
-  //         { position: 'top-right' }
-  //       )
-  //     }
-  //   } catch (err) {
-  //     console.error("Error at sending notification:", err);
-  //   }
-  // }
+  const handleDelete = async (id) => {
+    try {
+      await axiosPrivate.post('/notificari/delete', {
+        id_notificare: id
+      });
+      getNotificari();
+      toast.success("Notificare stearsa!", {
+        position: "top-right"
+      });
+
+    } catch (err) {
+      console.error("Error deleting notification: ", err);
+    }
+  }
 
 
   return (
@@ -88,22 +84,26 @@ function StudentPage() {
         <div className="dashboard">
           {/* Classes */}
           <section className="card classes" style={{ gridArea: "classes" }}>
-            <h3>Classes for the day</h3>
-            <div className="class-card">
-              <strong>Mathematics</strong>
-              <p>Professor Joe</p>
-              <small>5/2/22</small>
-            </div>
-            <div className="class-card">
-              <strong>Physics</strong>
-              <p>Professor John</p>
-              <small>5/2/22</small>
-            </div>
-            <div className="class-card">
-              <strong>Chemistry</strong>
-              <p>Professor Matt</p>
-              <small>5/2/22</small>
-            </div>
+            <h3>Notificari</h3>
+            {Array.isArray(notificari) && notificari.length > 0 ? (
+              (notificari.map((notificare) => (
+                <div className="class-card"
+                  key={notificare.id_notificare}
+                  onClick={() => navigate(notificare.link_destinatie)}
+                >
+                  <strong>{notificare.titlu}</strong>
+                  <p>{notificare.mesaj}</p>
+                  <small>{notificare.creat_la}</small>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // oprește propagarea către .class-card
+                      handleDelete(notificare.id_notificare);
+                    }}>Sterge</button>
+                </div>
+              )))
+            ) : (
+              <p>Nu exista notificari</p>
+            )}
           </section>
 
           <section className="card news" style={{ gridArea: "news" }}>

@@ -1,4 +1,4 @@
-const { Observatii_Cereri, Solicitari_Cereri, Users, Cereri } = require('../models');
+const { Observatii_Cereri, Solicitari_Cereri, Users, Cereri, Notificari } = require('../models');
 const NotificationService = require("../service/NotificationService");
 const EmailService = require("../service/EmailService");
 
@@ -40,15 +40,22 @@ const uploadObservatie = async (req, res) => {
             await NotificationService.sendNotification(
                 student.fcmToken,
                 "Observatie noua",
-                `Ai primit o noua observatie pentru ${solicitare.file_name}`
+                `Ai primit o noua observatie pentru ${cerere.title}`
             )
         }
+
+        await Notificari.create({
+            userId: student.userId,
+            titlu: "Observație nouă pentru cerere",
+            mesaj: `Ai primit o observație de la secretariat pentru cererea "${cerere.title}".`,
+            link_destinatie: `/cereri/solicitari/${solicitare.id_solicitare}`,
+        });
 
         // Trimitere email
         await EmailService.sendEmail({
             to: student.email,
             subject: "Observație nouă pentru cererea ta",
-            text: `Ai primit o observație pentru fișierul "${solicitare.file_name}":\nTitlu: ${title}\nConținut: ${continut}`,
+            text: `Ai primit o observație pentru solicitarea cererii "${cerere.title}":\nTitlu: ${title}\nConținut: ${continut}`,
             html: `
                 <p>Bună, ${student.firstName} ${student.lastName},</p>
                 <p>Ai primit o <strong>observație nouă</strong> din partea secretariatului pentru cererea:</p>

@@ -1,4 +1,4 @@
-const { Conversatii, Mesaje, Users } = require('../models');
+const { Conversatii, Mesaje, Users, Notificari } = require('../models');
 const NotificationService = require('../service/NotificationService');
 const EmailService = require("../service/EmailService");
 
@@ -10,6 +10,11 @@ const getAllConversatii = async (req, res) => {
                 attributes: ['id_conversatie', 'title', 'userId'],
                 where: {
                     userId: req.userId,
+                },
+                order: [['createdAt', 'DESC']],
+                include: {
+                    model: Users,
+                    attributes: ['userId', 'lastName', 'firstName', 'program_studiu', 'an_studiu', 'facultate']
                 },
                 order: [['createdAt', 'DESC']]
             });
@@ -29,6 +34,10 @@ const getAllConversatii = async (req, res) => {
                 where: {
                     program_studiu: user.program_studiu,
                     an_studiu: user.an_studiu
+                },
+                include: {
+                    model: Users,
+                    attributes: ['userId', 'lastName', 'firstName', 'program_studiu', 'an_studiu', 'facultate']
                 },
                 order: [['createdAt', 'DESC']]
             });
@@ -156,7 +165,16 @@ const sendMessage = async (req, res) => {
                         `Mesaj nou de la ${expeditorNume}`,
                         newMessage
                     );
-                    console.log("Notificare trimisă cu succes către:", destinatarId);
+                    //console.log("Notificare trimisă cu succes către:", destinatarId);
+
+                    // Salvează notificarea în baza de date
+                    await Notificari.create({
+                        userId: destinatar.userId,
+                        titlu: `Mesaj nou de la ${expeditorNume}`,
+                        mesaj: `Ai primit un mesaj: "${newMessage}"`,
+                        link_destinatie: `/inbox`,
+                    });
+
 
                     // Trimite email
                     await EmailService.sendEmail({
@@ -164,15 +182,15 @@ const sendMessage = async (req, res) => {
                         subject: `Mesaj nou de la ${expeditorNume} în FormUp`,
                         text: `Ai primit un mesaj nou:\n\n${newMessage}`,
                         html: `
-        <p>Bună, ${destinatar.firstName} ${destinatar.lastName},</p>
-        <p>Ai primit un mesaj nou în platforma <strong>FormUp</strong> de la <strong>${expeditorNume}</strong>.</p>
-        <blockquote style="border-left: 4px solid #ccc; padding-left: 10px; color: #555;">
-            ${newMessage}
-        </blockquote>
-        <p>Pentru a răspunde, intră în secțiunea „Inbox” din platformă.</p>
-        <br/>
-        <p>Cu stimă,<br/>Echipa FormUp</p>
-    `
+                                <p>Bună, ${destinatar.firstName} ${destinatar.lastName},</p>
+                                <p>Ai primit un mesaj nou în platforma <strong>FormUp</strong> de la <strong>${expeditorNume}</strong>.</p>
+                                <blockquote style="border-left: 4px solid #ccc; padding-left: 10px; color: #555;">
+                                    ${newMessage}
+                                </blockquote>
+                                <p>Pentru a răspunde, intră în secțiunea „Inbox” din platformă.</p>
+                                <br/>
+                                <p>Cu stimă,<br/>Echipa FormUp</p>
+                                `
                     });
 
                 } catch (notifErr) {
@@ -183,7 +201,7 @@ const sendMessage = async (req, res) => {
             }
         }
 
-        console.log("Mesaj salvat:", message);
+        //console.log("Mesaj salvat:", message);
         res.status(201).json(message);
     } catch (err) {
         console.error("Eroare la sendMessage:", err);

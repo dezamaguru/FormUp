@@ -62,4 +62,7 @@ db.Conversatii.hasMany(db.Mesaje, { foreignKey: 'id_conversatie' })
 db.Solicitari_Cereri.hasMany(db.Documente_Solicitari, {foreignKey: 'id_solicitare'});
 db.Documente_Solicitari.belongsTo(db.Solicitari_Cereri, {foreignKey: 'id_solicitare'});
 
+db.Users.hasMany(db.Notificari, {foreignKey: 'userId'});
+db.Notificari.belongsTo(db.Users, {foreignKey: 'userId'});
+
 module.exports = db;

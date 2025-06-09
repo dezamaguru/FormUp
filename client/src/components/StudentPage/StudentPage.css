@@ -15,8 +15,10 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /*înlocuiește space-between */
-  gap: 12rem; /* opțional: spațiu natural între header și conținut */
+  justify-content: flex-start;
+  /*înlocuiește space-between */
+  gap: 12rem;
+  /* opțional: spațiu natural între header și conținut */
   padding: 2rem;
 }
 
@@ -60,8 +62,8 @@ body {
 .dashboard {
   display: grid;
   grid-template-areas:
-    "classes classes news"
-    "classes classes  news";
+    "notificari notificari map"
+    "notificari notificari  map";
   grid-template-columns: 2fr 1fr 1fr;
   gap: 1.5rem;
   margin-top: 2rem;
@@ -73,6 +75,9 @@ body {
   border-radius: 20px;
   padding: 1.5rem;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  max-height: 50vh;
+  min-height: 60vh;
+  overflow: auto;
 }
 
 .card h3 {
@@ -85,6 +90,13 @@ body {
   margin-top: 1rem;
   padding: 1rem;
   border-radius: 12px;
+}
+
+.class-card:hover {
+  background: #e2e8f0;
+  background-color: #f1f5f9;
+  transform: translateY(-2px);
+  cursor: pointer;
 }
 
 /* Attendance */
@@ -140,24 +152,4 @@ body {
 .calendar-grid .active {
   background: #3b82f6;
   color: white;
-}
-
-/* News */
-.news-box {
-  margin-top: 1rem;
-}
-
-.news-box img {
-  width: 100%;
-  border-radius: 10px;
-}
-
-.read-more {
-  margin-top: 0.5rem;
-  padding: 0.4rem 0.8rem;
-  background: #67a5f8;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
 }

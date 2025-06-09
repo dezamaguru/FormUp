@@ -7,7 +7,6 @@ import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 const AddAdeverinta = ({ onAdd }) => {
   useFirebaseNotifications();
-  //const [name, setName] = useState('');
   const [tipAdeverinta, setTipAdeverinta] = useState('');
 
   const handleSubmit = async (e) => {
@@ -24,7 +23,6 @@ const AddAdeverinta = ({ onAdd }) => {
       });
 
       console.log("Adeverinta :", res.data);
-      // setName('');
       setTipAdeverinta('');
 
       if (onAdd) onAdd();
@@ -44,8 +42,11 @@ const AddAdeverinta = ({ onAdd }) => {
 
       const response = await axiosPrivate.post('/firebase/send-notification',
          data);
-      console.log(response);
+
+      //console.log(response);
       if (response.status === 200) {
+
+        
         toast.success(
           <div>
             <div>
@@ -97,55 +98,6 @@ const AddAdeverinta = ({ onAdd }) => {
             <option value="Tribunal">Tribunal</option>
             <option value="Work and Travel">Work and Travel</option>
           </select>
-        </div>
-
-        <div className="form-grid">
-          {/* <div className="form-group">
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              type="text"
-              placeholder="Nume complet student"
-              required
-            />
-          </div> */}
-
-          
-          {/* <div className="form-group">
-            <input id="email" type="email" placeholder="Email student" />
-          </div>
-
-           <div className="form-group">
-            <input id="facultyInput" type="text" placeholder="Facultate" />
-          </div>
-
-          <div className="form-group">
-            <input id="program" type="text" placeholder="Program de studiu" />
-          </div>
-
-          <div className="form-group">
-            <input id="year" type="text" placeholder="An universitar" />
-          </div>
-
-          <div className="form-group">
-            <input id="studyYear" type="text" placeholder="An studiu" />
-          </div>
-
-          <div className="form-group">
-            <input id="degree" type="text" placeholder="Studii universitare" />
-          </div>
-
-          <div className="form-group">
-            <input id="mode" type="text" placeholder="Formă de învățământ" />
-          </div>
-
-          <div className="form-group">
-            <input id="funding" type="text" placeholder="Formă finanțare" />
-          </div>
-
-          <div className="form-group">
-            <input id="group" type="text" placeholder="Grupa" />
-          </div> */}
         </div>
 
         <button type="submit" className="submit-btn">
