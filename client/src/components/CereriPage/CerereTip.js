@@ -34,40 +34,126 @@ function CerereTip() {
     }, [id, axiosPrivate]);
 
 
-    const handleDownload = async (id) => {
+    // const handleDownload = async (id, title) => {
+    //     try {
+    //         const res = await axiosPrivate.get(`/cereri/${id}/download`, {
+    //             responseType: "blob",
+    //         });
+
+    //         if (!res.data) {
+    //             throw new Error("Nu s-au primit date de la server");
+    //         }
+
+    //         const disposition = res.headers["content-disposition"];
+    //         let filename;
+
+    //         if (disposition) {
+    //             const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+    //             const matches = filenameRegex.exec(disposition);
+    //             if (matches != null && matches[1]) {
+    //                 filename = matches[1].replace(/['"]/g, "");
+    //             }
+    //         }
+
+    //         if (!filename) {
+    //             filename = `cerere_${id}`;
+    //         }
+
+    //         const blob = new Blob([res.data], {
+    //             type: res.headers["content-type"] || "application/octet-stream",
+    //         });
+
+    //         const url = window.URL.createObjectURL(blob);
+    //         const a = document.createElement("a");
+    //         a.style.display = "none";
+    //         a.href = url;
+    //         a.download = title;
+
+    //         document.body.appendChild(a);
+    //         a.click();
+
+    //         window.URL.revokeObjectURL(url);
+    //         document.body.removeChild(a);
+    //     } catch (err) {
+    //         console.error("Eroare la descărcare:", err);
+    //         alert(
+    //             "A apărut o eroare la descărcarea fișierului. Vă rugăm să încercați din nou."
+    //         );
+    //     }
+    // };
+
+    const handleDownload = async (id, title) => {
         try {
-            const res = await axiosPrivate.get(`/cereri/${id}/download`, {
-                responseType: "blob",
-            });
+            var res = null;
 
-            if (!res.data) {
-                throw new Error("Nu s-au primit date de la server");
+            if (title === "Cerere retragere licenta" || title === "Cerere retragere master") {
+                res = await axiosPrivate.get(`/cereri/${id}/generare-cerere-retragere`, {
+                    responseType: "blob",
+                });
+            };
+
+            if (title === "Cerere intrerupere studii licenta") {
+                res = await axiosPrivate.get(`/cereri/${id}/generare-cerere-intrerupere`, {
+                    responseType: "blob",
+                });
             }
 
-            const disposition = res.headers["content-disposition"];
-            let filename;
-
-            if (disposition) {
-                const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                const matches = filenameRegex.exec(disposition);
-                if (matches != null && matches[1]) {
-                    filename = matches[1].replace(/['"]/g, "");
-                }
+            if (title === "Cerere bursa sociala") {
+                res = await axiosPrivate.get(`/cereri/${id}/generare-cerere-bursa`, {
+                    responseType: "blob",
+                });
             }
 
-            if (!filename) {
-                filename = `cerere_${id}`; // Fallback pentru numele fișierului
+            if (title === "Cerere marire nota") {
+                res = await axiosPrivate.get(`/cereri/${id}/generare-cerere-marire`, {
+                    responseType: "blob",
+                });
             }
 
+            if (title === "Cerere solicitare situatie scolara") {
+                res = await axiosPrivate.get(`/cereri/${id}/generare-cerere-situatie`, {
+                    responseType: "blob",
+                });
+            }
+
+            if (title === "Cerere contestatie") {
+                res = await axiosPrivate.get(`/cereri/${id}/generare-cerere-contestatie`, {
+                    responseType: "blob",
+                });
+            }
+
+            if (title === "Cerere fisa de lichidare") {
+                res = await axiosPrivate.get(`/cereri/${id}/generare-cerere-lichidare`, {
+                    responseType: "blob",
+                });
+            }
+
+            if (title === "Cerere mobilitati definitive (in cadrul facultatii)") {
+                res = await axiosPrivate.get(`/cereri/${id}/generare-cerere-mobilitate`, {
+                    responseType: "blob",
+                });
+            }
+
+            if (title === "Cerere mobilitati definitive (intre universitati)") {
+                res = await axiosPrivate.get(`/cereri/${id}/generare-cerere-mobilitate-universitati`, {
+                    responseType: "blob",
+                });
+            }
+
+            if (title === "Cerere intrerupere studii master") {
+                res = await axiosPrivate.get(`/cereri/${id}/generare-cerere-intrerupere-master`, {
+                    responseType: "blob",
+                });
+            }
             const blob = new Blob([res.data], {
-                type: res.headers["content-type"] || "application/octet-stream",
+                type: res.headers["content-type"] || "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             });
 
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.style.display = "none";
             a.href = url;
-            a.download = cerereTip.title;
+            a.download = title;
 
             document.body.appendChild(a);
             a.click();
@@ -75,12 +161,11 @@ function CerereTip() {
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
         } catch (err) {
-            console.error("Eroare la descărcare:", err);
-            alert(
-                "A apărut o eroare la descărcarea fișierului. Vă rugăm să încercați din nou."
-            );
+            console.error("Eroare la descărcarea cererii personalizate:", err);
+            alert("A apărut o eroare la generarea documentului.");
         }
     };
+
 
     const handleAddSolicitare = async (id) => {
 
@@ -183,15 +268,9 @@ function CerereTip() {
                                 <p>Detalii cerere</p>
                                 <p>Nume: {cerereTip.title}</p>
                                 <p>Tip: {cerereTip.type}</p>
-                                <button onClick={() => handleDownload(cerereTip.id_cerere)}>
+                                <button onClick={() => handleDownload(cerereTip.id_cerere, cerereTip.title)}>
                                     Descarcă
                                 </button>
-
-                                {/* <form onSubmit={(e) => { e.preventDefault(); handleAddSolicitare(cerereTip.id_cerere) }}>
-                                    <input type="file" onChange={(e) => setFile(e.target.files[0])} required />
-
-                                    <button type="submit">Incarca cerere</button>
-                                </form> */}
 
                                 <button onClick={() => handleAddSolicitare(cerereTip.id_cerere)}>Adauga solicitare</button>
 

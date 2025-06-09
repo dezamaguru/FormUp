@@ -4,6 +4,7 @@ const { Solicitari_Cereri } = require('../models');
 const NotificationService = require("../service/NotificationService");
 const EmailService = require("../service/EmailService");
 const { Documente_Solicitari } = require('../models');
+const { where } = require('sequelize');
 
 const uploadSolicitareCerere = async (req, res) => {
     try {
@@ -261,12 +262,11 @@ const getAllSolicitariCereri = async (req, res) => {
 const getOneSolicitare = async (req, res) => {
     try {
         const solicitare = await Solicitari_Cereri.findOne({
-            where: {
-                id_solicitare: req.params.id,
-            }
-        })
+            where: { id_solicitare: req.params.id },
+            include: [{ model: Cereri, attributes: ['title'] }]
+        });
 
-        console.log("Solicitare gasita: ", solicitare);
+        console.log("Solicitare gasita: ", solicitare,);
         res.json(solicitare);
     } catch (err) {
         console.log("Eroare la getOneSolicitare: ", err);
@@ -328,7 +328,7 @@ const downloadDocument = async (req, res) => {
         const { id_document } = req.query;
         const document = await Documente_Solicitari.findByPk(id_document,
             {
-                attributes: ['mime_type', 'file_data', 'file_name'], 
+                attributes: ['mime_type', 'file_data', 'file_name'],
             }
         );
 

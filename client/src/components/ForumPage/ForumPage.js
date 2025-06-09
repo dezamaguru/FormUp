@@ -160,7 +160,7 @@ const ForumPage = () => {
 
                     <section className="main-right">
                         <div className="header-right">
-                            <p className="name friend-dane">Titlu: {titluConversatie}</p>
+                            <p className="name friend-dane">{titluConversatie}</p>
                         </div>
 
                         <div className="some-btn">

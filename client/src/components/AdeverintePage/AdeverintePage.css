@@ -43,13 +43,6 @@
   color: #64748b;
 }
 
-/* .page-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  box-sizing: border-box;
-} */
-
 .main-content {
   flex: 1;
   display: flex;

@@ -120,7 +120,6 @@ function Cereri() {
         </header>
 
         {auth?.type === "student" && (
-
           <div className="dashboard-cereri" style={{ gridArea: "cereri" }}>
             <section className="card-cereri">
               {Array.isArray(cereri) && cereri.length > 0 ? (

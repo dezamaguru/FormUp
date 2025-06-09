@@ -25,6 +25,7 @@ function SolicitareCerere() {
     const [selectedObservatieId, setSelectedObservatieId] = useState(null);
     const [files, setFiles] = useState([]);
     const [documente, setDocumente] = useState([]);
+    const [cerere , setCerere] = useState("");
 
     useEffect(() => {
         let isMounted = true;
@@ -245,7 +246,7 @@ function SolicitareCerere() {
                 throw new Error("Nu s-au primit date de la server");
             }
 
-            let filename = "document.pdf"; 
+            let filename = "document.pdf";
             const disposition = res.headers["content-disposition"];
             console.log("Filename", disposition);
             console.log(res.headers["content-disposition"]);
@@ -301,55 +302,56 @@ function SolicitareCerere() {
                 {auth?.type === "student" && (
                     <div className="dashboard-solicitare" style={{ gridArea: "solicitare" }}>
                         <section className="card-solicitare">
-                            {solicitare ? (
-                                <div className="solicitare-card">
-                                    <p>Detalii solicitare</p>
-                                    <strong>ID Solicitare: {solicitare.id_solicitare}</strong>
-                                    <p>ID Cerere: {solicitare.id_cerere}</p>
-                                    <p>ID Utilizator: {solicitare.userId}</p>
-                                    <p>Status: {solicitare.status}</p>
+                            <section className='detalii-container' style={{ gridArea: "detalii" }}>
+                                {solicitare ? (
+                                    <div className="solicitare-card">
+                                        <strong>Solicitare pentru {solicitare?.Cereri?.title}</strong>
+                                        <p>Status: {solicitare.status}</p>
+                                    </div>
+                                ) : (
+                                    <p>Nu exista detalii pentru acesta solicitare</p>
+                                )}
+
+                                <div
+                                    className="dropzone"
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={(e) => {
+                                        e.preventDefault();
+                                        const droppedFiles = Array.from(e.dataTransfer.files);
+                                        setFiles((prev) => [...prev, ...droppedFiles]);
+                                    }}
+                                >
+                                    <p>Trage fișiere aici sau folosește butonul de mai jos</p>
                                 </div>
-                            ) : (
-                                <p>Nu exista detalii pentru acesta solicitare</p>
-                            )}
 
-                            <div
-                                className="dropzone"
-                                onDragOver={(e) => e.preventDefault()}
-                                onDrop={(e) => {
-                                    e.preventDefault();
-                                    const droppedFiles = Array.from(e.dataTransfer.files);
-                                    setFiles((prev) => [...prev, ...droppedFiles]);
-                                }}
-                            >
-                                <p>Trage fișiere aici sau folosește butonul de mai jos</p>
-                            </div>
+                                <input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => setFiles((prev) => [...prev, ...Array.from(e.target.files)])}
+                                />
 
-                            <input
-                                type="file"
-                                multiple
-                                onChange={(e) => setFiles((prev) => [...prev, ...Array.from(e.target.files)])}
-                            />
+                                <ul>
+                                    {files.map((file, index) => (
+                                        <li key={index}>{file.name}</li>
+                                    ))}
+                                </ul>
 
-                            <ul>
-                                {files.map((file, index) => (
-                                    <li key={index}>{file.name}</li>
-                                ))}
-                            </ul>
+                                <button className="upload-btn" onClick={handleUploadDocumente}>
+                                    Încarcă documente
+                                </button>
+                            </section>
 
-                            <button onClick={handleUploadDocumente}>
-                                Încarcă documente
-                            </button>
-
-                            <section className='documente-container'>
+                            <section className='documente-container' style={{ gridArea: "documente" }}>
                                 {Array.isArray(documente) && documente.length > 0 ? (
                                     documente.map((doc) => (
                                         <div
                                             key={doc.id_document}
                                             className='observatie-card'>
                                             <strong>{doc.file_name}</strong>
-                                            <button onClick={() => handleDeleteDocument(doc.id_document)}>Sterge</button>
-                                            <button onClick={() => handleDownloadDocument(doc.id_document, doc.file_name)}>Descarca</button>
+                                            <button className="delete-btn" onClick={() => handleDeleteDocument(doc.id_document)}>
+                                                Șterge
+                                            </button>
+                                            <button className="download-btn" onClick={() => handleDownloadDocument(doc.id_document, doc.file_name)}>Descarca</button>
                                         </div>
                                     ))
                                 ) : (

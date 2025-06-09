@@ -9,7 +9,7 @@ function AdaugaConversatie() {
 
     const handleSubmit = async (e) => {
         //e.preventDefault();
-
+        
         if (!titlu) {
             alert("Subiect obligatoriu!");
             return;

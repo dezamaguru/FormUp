@@ -10,7 +10,8 @@ const getAllConversatii = async (req, res) => {
                 attributes: ['id_conversatie', 'title', 'userId'],
                 where: {
                     userId: req.userId,
-                }
+                },
+                order: [['createdAt', 'DESC']]
             });
             res.status(201).json(conversatii);
 
@@ -28,7 +29,8 @@ const getAllConversatii = async (req, res) => {
                 where: {
                     program_studiu: user.program_studiu,
                     an_studiu: user.an_studiu
-                }
+                },
+                order: [['createdAt', 'DESC']]
             });
             res.status(201).json(conversatii);
 
