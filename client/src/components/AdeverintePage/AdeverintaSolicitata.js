@@ -8,7 +8,7 @@ import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
 const AdeverintaSolicitata = () => {
   useFirebaseNotifications();
-  const { id } = useParams(); // extragerea id-ului din URL
+  const { id } = useParams();
   const [adeverinta, setAdeverinta] = useState(null);
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
@@ -137,7 +137,7 @@ const AdeverintaSolicitata = () => {
       <main className="main-content">
         {/* Top bar */}
         <header className="header">
-          <h1>Welcome, Student!</h1>
+          <h1>Welcome!</h1>
           <div className="header-buttons">
             <button className="icon-button" aria-label="Notifications">
               🔔
@@ -203,21 +203,23 @@ const AdeverintaSolicitata = () => {
               <div>
                 {adeverinta ? (
                   <>
-                    <p> Detalii adeverinta:</p>
-                    <p>
-                      <strong>Tip Adeverință:</strong> {adeverinta.tip_adeverinta}
-                    </p>
-                    <p>
-                      <strong>Nume Student:</strong> {adeverinta.nume_student}
-                    </p>
-                    <p>
-                      <strong>Status:</strong> {adeverinta.status}
-                    </p>
-                    <br />
-                    <br />
-                    <p>Sectiune de incarcare adeverinte</p>
+                    <h2>Detalii Adeverință</h2>
+                    <div className="detail-row">
+                      <span className="detail-label">Tip Adeverință:</span>
+                      <span>{adeverinta.tip_adeverinta}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">Nume Student:</span>
+                      <span>{adeverinta.nume_student}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">Status:</span>
+                      <span className={`status-badge ${adeverinta.status.toLowerCase()}`}>
+                        {adeverinta.status}
+                      </span>
+                    </div>
 
-                    <form
+                    {/* <form
                       onSubmit={handleUploadAdeverintaSolicitata}
                       style={{ marginBottom: "20px" }}
                     >
@@ -227,7 +229,7 @@ const AdeverintaSolicitata = () => {
                         required
                       />
                       <button type="submit">Incarca adeverinta</button>
-                    </form>
+                    </form> */}
                   </>
                 ) : (
                   <p>Nu exista detalii pentru aceasta deverinta</p>

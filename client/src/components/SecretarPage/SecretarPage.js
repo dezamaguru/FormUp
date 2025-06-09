@@ -3,7 +3,7 @@ import SideBar from "../SideBar/SideBar";
 import { generateToken } from "../Notificari/firebase";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useEffect, useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer} from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 import Map from '../Maps/GoogleMaps';
 
@@ -27,38 +27,38 @@ function SecretarRole() {
     fetchFcmToken();
   }, []);
 
-  const handlePushNotification = async () => {
-    try {
-      var data = {
-        title: "Test",
-        body: "notificare test de la secretar",
-        deviceToken: "eES-JCMTkxpLAgtOqPSIdw:APA91bELtbZZgqyR49BK7E2Ub4oRtxv-NNM2DH19YjKDxAfo3QE5IlHDM6YuMx0DJdiITuQfZdRBBqHA8cdaYuOod8idrIHJJyqVCP9mwZS1VrP-xgUaOp8"
-      };
-      const response = await axiosPrivate.post('/firebase/send-notification', data);
-      console.log(response);
-      if (response.status === 200) {
-        toast.success(
-          <div>
-            <div>
-              Notification sent
-            </div>
-          </div>,
-          { position: 'top-right' }
-        )
-      } else {
-        toast.error(
-          <div>
-            <div>
-              Failed to send notification
-            </div>
-          </div>,
-          { position: 'top-right' }
-        )
-      }
-    } catch (err) {
-      console.error("Error at sending notification:", err);
-    }
-  }
+  // const handlePushNotification = async () => {
+  //   try {
+  //     var data = {
+  //       title: "Test",
+  //       body: "notificare test de la secretar",
+  //       deviceToken: "eES-JCMTkxpLAgtOqPSIdw:APA91bELtbZZgqyR49BK7E2Ub4oRtxv-NNM2DH19YjKDxAfo3QE5IlHDM6YuMx0DJdiITuQfZdRBBqHA8cdaYuOod8idrIHJJyqVCP9mwZS1VrP-xgUaOp8"
+  //     };
+  //     const response = await axiosPrivate.post('/firebase/send-notification', data);
+  //     console.log(response);
+  //     if (response.status === 200) {
+  //       toast.success(
+  //         <div>
+  //           <div>
+  //             Notification sent
+  //           </div>
+  //         </div>,
+  //         { position: 'top-right' }
+  //       )
+  //     } else {
+  //       toast.error(
+  //         <div>
+  //           <div>
+  //             Failed to send notification
+  //           </div>
+  //         </div>,
+  //         { position: 'top-right' }
+  //       )
+  //     }
+  //   } catch (err) {
+  //     console.error("Error at sending notification:", err);
+  //   }
+  // }
 
   return (
     <div className="student-page">
@@ -99,18 +99,7 @@ function SecretarRole() {
             </div>
           </section>
 
-          {/* News */}
           <section className="card news" style={{ gridArea: "news" }}>
-            <h3>News & Updates</h3>
-            <div className="news-box">
-              <p>Universities to announce exams</p>
-              <button className="read-more"
-                onClick={handlePushNotification}
-              >Send</button>
-            </div>
-          </section>
-
-          <section>
             <Map />
           </section>
         </div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../api/axios";
 import { ToastContainer} from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
+import './AdaugaConversatie.css'
 
 function AdaugaConversatie() {
     useFirebaseNotifications();
@@ -9,7 +10,7 @@ function AdaugaConversatie() {
 
     const handleSubmit = async (e) => {
         //e.preventDefault();
-        
+
         if (!titlu) {
             alert("Subiect obligatoriu!");
             return;
@@ -30,7 +31,7 @@ function AdaugaConversatie() {
     return (
         <div>
             <ToastContainer />
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="form-adauga-conversatie">
                 <input
                     type="text"
                     value={titlu}

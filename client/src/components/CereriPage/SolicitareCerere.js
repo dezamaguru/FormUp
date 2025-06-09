@@ -12,8 +12,6 @@ function SolicitareCerere() {
     useFirebaseNotifications();
     const [solicitare, setSolicitare] = useState();
     const axiosPrivate = useAxiosPrivate();
-    const navigate = useNavigate();
-    const location = useLocation();
     const { auth } = useAuth();
     const { id } = useParams();
     const [statusSolicitare, setStatusAdeverinta] = useState("");
@@ -25,7 +23,7 @@ function SolicitareCerere() {
     const [selectedObservatieId, setSelectedObservatieId] = useState(null);
     const [files, setFiles] = useState([]);
     const [documente, setDocumente] = useState([]);
-    const [cerere , setCerere] = useState("");
+    const [cerere, setCerere] = useState("");
 
     useEffect(() => {
         let isMounted = true;
@@ -385,30 +383,75 @@ function SolicitareCerere() {
 
                 {auth?.type === 'secretar' && (
                     <div className="dashboard-solicitare" style={{ gridArea: "solicitare" }}>
-                        <section className="ccard-solicitare">
-                            {solicitare ? (
-                                <div className="solicitare-card">
-                                    <p>Detalii solicitare</p>
-                                    <strong>ID Solicitare: {solicitare.id_solicitare}</strong>
-                                    <p>ID Cerere: {solicitare.id_cerere}</p>
-                                    <p>ID Utilizator: {solicitare.userId}</p>
-                                    <p>Status: {solicitare.status}</p>
-                                    <form onSubmit={(e) => handleStatusChange(e, solicitare.id_solicitare)}>
-                                        <select
-                                            value={statusSolicitare}
-                                            onChange={(e) => setStatusAdeverinta(e.target.value)}
-                                        >
-                                            <option value="" disabled hidden>Schimba status</option>
-                                            <option value="Procesare">Procesare</option>
-                                            <option value="Aprobata">Aprobata</option>
-                                            <option value="Respinsa">Respinsa</option>
-                                        </select>
-                                        <button type='submit'>Update status</button>
-                                    </form>
-                                </div>
-                            ) : (
-                                <p>Nu exista detalii pentru acesta solicitare</p>
-                            )}
+                        <section className="card-solicitare">
+                            <section className='detalii-container' style={{ gridArea: "detalii" }}>
+                                {solicitare ? (
+                                    <div className="solicitare-card">
+                                        <p>Detalii solicitare</p>
+                                        <strong>Solicitare pentru {solicitare?.Cereri?.title}</strong>
+                                        <p>Student: {solicitare?.User?.firstName} {solicitare?.User?.lastName}</p>
+                                        <p>Status: {solicitare.status}</p>
+                                        <form onSubmit={(e) => handleStatusChange(e, solicitare.id_solicitare)}>
+                                            <select
+                                                value={statusSolicitare}
+                                                onChange={(e) => setStatusAdeverinta(e.target.value)}
+                                            >
+                                                <option value="" disabled hidden>Schimba status</option>
+                                                <option value="Procesare">Procesare</option>
+                                                <option value="Aprobata">Aprobata</option>
+                                                <option value="Respinsa">Respinsa</option>
+                                            </select>
+                                            <button type='submit'>Update status</button>
+                                        </form>
+                                    </div>
+                                ) : (
+                                    <p>Nu exista detalii pentru acesta solicitare</p>
+                                )}
+
+                                {/* <div
+                                    className="dropzone"
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={(e) => {
+                                        e.preventDefault();
+                                        const droppedFiles = Array.from(e.dataTransfer.files);
+                                        setFiles((prev) => [...prev, ...droppedFiles]);
+                                    }}
+                                >
+                                    <p>Trage fișiere aici sau folosește butonul de mai jos</p>
+                                </div> */}
+
+                                <input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => setFiles((prev) => [...prev, ...Array.from(e.target.files)])}
+                                />
+
+                                <ul>
+                                    {files.map((file, index) => (
+                                        <li key={index}>{file.name}</li>
+                                    ))}
+                                </ul>
+
+                                <button className="upload-btn" onClick={handleUploadDocumente}>
+                                    Încarcă documente
+                                </button>
+                            </section>
+
+                            <section className='documente-container' style={{ gridArea: "documente" }}>
+                                {Array.isArray(documente) && documente.length > 0 ? (
+                                    documente.map((doc) => (
+                                        <div
+                                            key={doc.id_document}
+                                            className='observatie-card'>
+                                            <strong>{doc.file_name}</strong>
+                                            <button className="download-btn" onClick={() => handleDownloadDocument(doc.id_document, doc.file_name)}>Descarca</button>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>Nu exista documente pentru aceasta solicitare</p>
+                                )}
+                            </section>
+
                         </section>
 
                         {/* Observatii */}

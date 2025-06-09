@@ -20,7 +20,7 @@ function Cereri() {
   const location = useLocation();
   const { auth } = useAuth();
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(4);
+  const [pageSize, setPageSize] = useState(3);
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
@@ -180,13 +180,25 @@ function Cereri() {
                     key={solicitare.id_solicitare}
                     className='istoric-card'
                     onClick={() => navigate(`/cereri/solicitari/${solicitare.id_solicitare}`)}>
-                    <strong>Solicitare: {solicitare.id_solicitare}</strong>
+                    <strong>Solicitare pentru: {solicitare.Cereri?.title}</strong>
+                    <p>Student: {solicitare.User?.firstName} {solicitare.User?.lastName}</p>
                     <p>Status: {solicitare.status}</p>
                   </div>
                 ))
               ) : (
                 <p>Nu exista solicitari</p>
               )}
+
+              <Paginator
+                page={page}
+                pageSize={pageSize}
+                totalRecords={totalCount}
+                onPageChange={setPage}
+                onPageSizeChange={(newSize) => {
+                  setPageSize(Number(newSize));
+                  setPage(0);
+                }}
+              />
             </section>
 
             <section className="card-cereri">
@@ -238,16 +250,6 @@ function Cereri() {
                 <p>Nu există cereri disponibile.</p>
               )}
 
-              <Paginator
-                page={page}
-                pageSize={pageSize}
-                totalRecords={totalCount}
-                onPageChange={setPage}
-                onPageSizeChange={(newSize) => {
-                  setPageSize(Number(newSize));
-                  setPage(0);
-                }}
-              />
             </section>
           </div>
         )}

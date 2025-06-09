@@ -4,7 +4,6 @@ const { Solicitari_Cereri } = require('../models');
 const NotificationService = require("../service/NotificationService");
 const EmailService = require("../service/EmailService");
 const { Documente_Solicitari } = require('../models');
-const { where } = require('sequelize');
 
 const uploadSolicitareCerere = async (req, res) => {
     try {
@@ -218,10 +217,10 @@ const getAllSolicitariCereri = async (req, res) => {
                 where: {
                     userId: req.userId,
                 },
+                include: [{ model: Cereri, attributes: ['title'] }],
                 order: [['createdAt', 'DESC']],
                 limit,
-                offset,
-                order: [['createdAt', 'DESC']]
+                offset
             });
 
             return res.json({ solicitari: rows, total: count });
@@ -235,19 +234,24 @@ const getAllSolicitariCereri = async (req, res) => {
 
             const { count, rows } = await Solicitari_Cereri.findAndCountAll({
                 attributes: ["id_solicitare", "id_cerere", "userId", "status"],
-                include: {
-                    model: Users,
-                    attributes: ['program_studiu', 'an_studiu'],
-                    where: {
-                        program_studiu: secretar.program_studiu,
-                        an_studiu: secretar.an_studiu,
-                        type: 'student'
+                include: [
+                    {
+                        model: Users,
+                        attributes: ['firstName', 'lastName', 'program_studiu', 'an_studiu'],
+                        where: {
+                            program_studiu: secretar.program_studiu,
+                            an_studiu: secretar.an_studiu,
+                            type: 'student'
+                        }
+                    },
+                    {
+                        model: Cereri,
+                        attributes: ['title']
                     }
-                },
+                ],
                 order: [['createdAt', 'DESC']],
                 limit,
-                offset,
-                order: [['createdAt', 'DESC']]
+                offset
             });
 
             return res.json({ solicitari: rows, total: count });
@@ -263,7 +267,10 @@ const getOneSolicitare = async (req, res) => {
     try {
         const solicitare = await Solicitari_Cereri.findOne({
             where: { id_solicitare: req.params.id },
-            include: [{ model: Cereri, attributes: ['title'] }]
+            include: [
+                { model: Cereri, attributes: ['title'] },
+                { model: Users, attributes: ['firstName', 'lastName'] }
+            ]
         });
 
         console.log("Solicitare gasita: ", solicitare,);

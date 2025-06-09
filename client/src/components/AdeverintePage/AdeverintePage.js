@@ -131,24 +131,23 @@ function AdeverintePage() {
 
         {auth?.type === "secretar" && (
           <div>
-            <p className="section-title">Solicitari adeverinte</p>
-
             <div className="history-list">
-              {Array.isArray(adeverinte) && adeverinte.length > 0 ? 
-              (adeverinte.map((adeverinta) => (
-                <div
-                  key={adeverinta.id_adeverinta}
-                  className="history-card"
-                  onClick={() => handleClick(adeverinta.id_adeverinta, adeverinta.status)}
-                >
-                  <strong>{adeverinta.tip_adeverinta}</strong>
-                  <p>{adeverinta.nume_student}</p>
-                  <small>{adeverinta.status}</small>
-                </div>
-              ))
-              ) : (
-                <p>Nu exista solicitari pentru adeverinte.</p>
-              )}
+              <p className="section-title">Solicitari adeverinte</p>
+              {Array.isArray(adeverinte) && adeverinte.length > 0 ?
+                (adeverinte.map((adeverinta) => (
+                  <div
+                    key={adeverinta.id_adeverinta}
+                    className="history-card"
+                    onClick={() => handleClick(adeverinta.id_adeverinta, adeverinta.status)}
+                  >
+                    <strong>{adeverinta.tip_adeverinta}</strong>
+                    <p>{adeverinta.nume_student}</p>
+                    <small>{adeverinta.status}</small>
+                  </div>
+                ))
+                ) : (
+                  <p>Nu exista solicitari pentru adeverinte.</p>
+                )}
             </div>
             <Paginator
               page={page}

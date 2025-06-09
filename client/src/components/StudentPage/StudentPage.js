@@ -33,38 +33,38 @@ function StudentPage() {
     fetchFcmToken();
   }, []);
 
-  const handlePushNotification = async () => {
-    try {
-      var data = {
-        title: "Test",
-        body: "notificare test de la student",
-        deviceToken: "fYLyQN5NAXoaMqPq6x3RjS:APA91bGePzcCGCbzzNIUaayrJEyjndrrEzox9mm6Y8WIgr1bDON7hVENUOowTRCSpFzKBmfkL0xcrPDBpxHLNA4bOr_9Yc1ZzzBsMdwZfWdC2kDh5w9dhI8"
-      };
-      const response = await axiosPrivate.post('/firebase/send-notification', data);
-      console.log(response);
-      if (response.status === 200) {
-        toast.success(
-          <div>
-            <div>
-              Notification sent
-            </div>
-          </div>,
-          { position: 'top-right' }
-        )
-      } else {
-        toast.error(
-          <div>
-            <div>
-              Failed to send notification
-            </div>
-          </div>,
-          { position: 'top-right' }
-        )
-      }
-    } catch (err) {
-      console.error("Error at sending notification:", err);
-    }
-  }
+  // const handlePushNotification = async () => {
+  //   try {
+  //     var data = {
+  //       title: "Test",
+  //       body: "notificare test de la student",
+  //       deviceToken: "fYLyQN5NAXoaMqPq6x3RjS:APA91bGePzcCGCbzzNIUaayrJEyjndrrEzox9mm6Y8WIgr1bDON7hVENUOowTRCSpFzKBmfkL0xcrPDBpxHLNA4bOr_9Yc1ZzzBsMdwZfWdC2kDh5w9dhI8"
+  //     };
+  //     const response = await axiosPrivate.post('/firebase/send-notification', data);
+  //     console.log(response);
+  //     if (response.status === 200) {
+  //       toast.success(
+  //         <div>
+  //           <div>
+  //             Notification sent
+  //           </div>
+  //         </div>,
+  //         { position: 'top-right' }
+  //       )
+  //     } else {
+  //       toast.error(
+  //         <div>
+  //           <div>
+  //             Failed to send notification
+  //           </div>
+  //         </div>,
+  //         { position: 'top-right' }
+  //       )
+  //     }
+  //   } catch (err) {
+  //     console.error("Error at sending notification:", err);
+  //   }
+  // }
 
 
   return (
@@ -106,21 +106,10 @@ function StudentPage() {
             </div>
           </section>
 
-          {/* News */}
           <section className="card news" style={{ gridArea: "news" }}>
-            {/* <h3>News & Updates</h3>
-            <div className="news-box">
-              <p>Universities to announce exams</p>
-              <button className="read-more"
-                onClick={handlePushNotification}
-              >Send</button>
-            </div> */}
             <Map />
           </section>
 
-          {/* <section>
-            <Map />
-          </section> */}
         </div>
       </main>
     </div>
