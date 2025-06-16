@@ -20,7 +20,7 @@ function SecretarRole() {
       const token = await generateToken();
       await axiosPrivate.post('/users/fcm-token', { token });
       setFcmToken(token);
-      //console.log(token);
+      console.log("Token FCM generat:", token);
     } catch (err) {
       console.error("Error getting FCM token: ", err);
     }

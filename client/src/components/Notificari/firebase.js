@@ -28,7 +28,7 @@ export const generateToken = async () => {
     console.log(permission);
     if(permission === "granted"){
       const token = await getToken(messaging, {
-        vapidKey: "BIIdLCRQgFmhg0SUtPcDX3k-FBktNkPcm1IcmU1YD0amfwI_NkJwUoTphCR4alZHAUu1Btv8tj6gn59QXfGgGKo"
+        vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY
     });
     console.log(token);
     return token;

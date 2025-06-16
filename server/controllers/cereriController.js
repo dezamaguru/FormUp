@@ -136,7 +136,6 @@ const downloadCerere = async (req, res) => {
     res.setHeader('Content-Type', cerere.mime_type || 'application/octet-stream');
     res.setHeader('Content-Disposition', `attachment; filename="${cerere.title}"`);
     res.setHeader('Content-Length', cerere.file_data.length);
-
     // Trimitem datele
     res.send(cerere.file_data);
   } catch (err) {
