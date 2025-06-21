@@ -5,7 +5,7 @@ const adeverinteController = require('../controllers/adeverinteController');
 const multer = require('multer');
 const upload = multer();
 
-router.post('/upload', verifyJWT, upload.single('file'), adeverinteController.adaugaSolicitare); //inserare solicitare in db 
+router.post('/upload', verifyJWT, adeverinteController.adaugaSolicitare); //inserare solicitare in db 
 router.get('/', verifyJWT, adeverinteController.getAllAdeverinte);
 router.get('/:id', verifyJWT, adeverinteController.getOneAdeverinta);
 router.post('/:id/upload', verifyJWT, upload.single('file'), adeverinteController.uploadAdeverintaSolicitata);

@@ -22,25 +22,25 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    file_data: {
-      type: DataTypes.BLOB('long'),
+    file_path: {
+      type: DataTypes.STRING(512),
       allowNull: false,
     },
     uploadedBy: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'Users',
-        key: 'userId'
-      },
-      onDelete: 'CASCADE'
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'userId'
     },
-    destinatar:{
-      type: DataTypes.INTEGER
-    }
+    onDelete: 'CASCADE'
+  },
+    destinatar: {
+    type: DataTypes.INTEGER
+  }
   }, {
-    tableName: 'documente_solicitari'
-  });
+  tableName: 'documente_solicitari'
+});
 
-  return Documente_Solicitari;
+return Documente_Solicitari;
 }

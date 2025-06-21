@@ -8,23 +8,23 @@ module.exports = (sequelize, DataTypes) => {
         },
         title: {
             type: DataTypes.STRING(255),
-            allowNull: false 
+            allowNull: false
         },
-        type :{
-            type: DataTypes.ENUM('licenta', 'master', 'comun','altele'),
+        type: {
+            type: DataTypes.ENUM('licenta', 'master', 'comun', 'altele'),
             //allowNull: false 
         },
         mime_type: {
             type: DataTypes.STRING(100),
-            allowNull: false 
+            allowNull: false
         },
         filename: {
             type: DataTypes.STRING(255),
             allowNull: false
         },
-        file_data: {
-            type: DataTypes.BLOB("long"), // Echivalent pentru LONGBLOB
-            allowNull: false 
+        file_path: {
+            type: DataTypes.STRING(512),
+            allowNull: true
         }
     }, {
         tableName: 'cereri' // Specifică explicit numele tabelului

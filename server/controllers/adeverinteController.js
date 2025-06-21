@@ -3,6 +3,9 @@ const NotificationService = require("../service/NotificationService");
 const EmailService = require("../service/EmailService");
 const { generatePDFBuffer } = require("../service/GeneratePDFService");
 const { Notificari } = require('../models');
+const fs = require("fs");
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 
 const getAllAdeverinte = async (req, res) => {
     try {
@@ -120,19 +123,21 @@ const adaugaSolicitare = async (req, res) => {
         };
 
         // Generează PDF din template
-        //const pdfBuffer = await generatePDFBuffer("adeverinta", pdfData);
-        const raw = await generatePDFBuffer("adeverinta", pdfData, true);
+        const raw = await generatePDFBuffer("adeverinta", pdfData);
         const pdfBuffer = Buffer.from(raw); // forțează conversia
 
-        // Salvează în baza de date
+        const uniqueFilename = `adeverinta_${student.lastName}_${student.firstName}_${uuidv4().slice(0, 8)}.pdf`;
+        const savePath = path.join("uploads", "adeverinte", uniqueFilename);
+
+        fs.writeFileSync(savePath, pdfBuffer);
+
         const newAdeverinta = await Solicitari_Adeverinte.create({
             tip_adeverinta: tipAdeverinta,
             userId: req.userId,
             nume_student: `${student.lastName} ${student.firstName}`,
             status: "Aprobata",
-            filename: `adeverinta_${student.lastName}_${student.firstName}.pdf`,
-            mime_type: "application/pdf",
-            file_data: pdfBuffer,
+            filename: uniqueFilename,
+            mime_type: "application/pdf"
         });
 
         //creaza notificari
@@ -279,36 +284,31 @@ const uploadAdeverintaSolicitata = async (req, res) => {
 }
 
 const downloadAdeverintaSolicitata = async (req, res) => {
-    try {
-        const adeverinta = await Solicitari_Adeverinte.findByPk(req.params.id,
-            {
-                attributes: ['tip_adeverinta', 'mime_type', 'file_data', 'filename'], //
-            }
-        );
+  try {
+    const adeverinta = await Solicitari_Adeverinte.findByPk(req.params.id, {
+      attributes: ['tip_adeverinta', 'mime_type', 'filename']
+    });
 
-        if (!adeverinta) {
-            return res.status(404).json({ message: "Adeverinta nu a fost gasita" });
-        }
-
-        if (!adeverinta.file_data) {
-            return res.status(404).json({ message: "Continutul adeverintei lipseste" });
-        }
-
-        let filename = adeverinta.filename;
-        filename = filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-
-
-        // Modificăm modul în care setăm numele fișierului în header
-        res.setHeader('Content-Type', adeverinta.mime_type || 'application/octet-stream');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-        res.setHeader('Content-Length', adeverinta.file_data.length);
-
-        res.send(adeverinta.file_data);
-    } catch (err) {
-        console.error('Eroare la descarcarea adeverintei: ', err);
-        res.status(500).json({ message: "Eroare la descărcarea fișierului", error: err.message });
+    if (!adeverinta || !adeverinta.filename) {
+      return res.status(404).json({ message: "Fișierul nu a fost găsit" });
     }
-}
+
+    const filePath = path.join("uploads", "adeverinte", adeverinta.filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "Fișierul lipsește de pe server" });
+    }
+
+    res.setHeader('Content-Type', adeverinta.mime_type || 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${adeverinta.filename}"`);
+    
+    const stream = fs.createReadStream(filePath);
+    stream.pipe(res);
+  } catch (err) {
+    console.error('Eroare la descărcarea fișierului:', err);
+    res.status(500).json({ message: "Eroare la descărcare", error: err.message });
+  }
+};
 
 
 module.exports = {

@@ -5,6 +5,8 @@ const NotificationService = require("../service/NotificationService");
 const EmailService = require("../service/EmailService");
 const { Documente_Solicitari } = require('../models');
 const { Notificari } = require('../models');
+const path = require("path");
+const fs = require("fs");
 
 const uploadSolicitareCerere = async (req, res) => {
     try {
@@ -111,18 +113,29 @@ const uploadDocumenteSolicitareCerere = async (req, res) => {
             return res.status(404).json({ message: "Solicitarea nu a fost găsită." });
         }
 
+        const folderPath = path.join(__dirname, "../uploads/solicitari", String(id_solicitare));
+        await fs.promises.mkdir(folderPath, { recursive: true });
+
         // Încarcă fișiere
         const documente = await Promise.all(
-            files.map(file =>
-                Documente_Solicitari.create({
+            files.map(async (file) => {
+                const timestamp = Date.now();
+                const uploaderType = req.type || "user";
+                const sanitizedName = file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+                const fileName = `${uploaderType}_${req.userId}_${timestamp}_${sanitizedName}`;
+                const filePath = path.join(folderPath, fileName);
+
+                await fs.promises.writeFile(filePath, file.buffer);
+
+                return Documente_Solicitari.create({
                     id_solicitare: solicitare.id_solicitare,
                     file_name: file.originalname,
                     mime_type: file.mimetype,
-                    file_data: file.buffer,
+                    file_path: filePath,
                     uploadedBy: req.userId,
                     destinatar: req.body.destinatar || null
-                })
-            )
+                });
+            })
         );
 
         const student = solicitare.User;
@@ -195,9 +208,7 @@ const uploadDocumenteSolicitareCerere = async (req, res) => {
 
         res.status(201).json({
             message: "Documentele au fost salvate cu succes!",
-            newSolicitare: {
-                id_solicitare: solicitare.id_solicitare
-            },
+            newSolicitare: { id_solicitare: solicitare.id_solicitare },
             documente: documente.map(doc => ({ file_name: doc.file_name }))
         });
 
@@ -228,18 +239,28 @@ const getAllDocumente = async (req, res) => {
 const deleteDocument = async (req, res) => {
     try {
         const { id_document } = req.body;
+
+        const document = await Documente_Solicitari.findByPk(id_document);
+        if (!document) {
+            return res.status(404).json({ message: "Documentul nu a fost găsit." });
+        }
+
+
+        // Șterge fișierul de pe disc, dacă există
+        if (document.file_path && fs.existsSync(document.file_path)) {
+            await fs.promises.unlink(document.file_path);
+        }
+
+        // Șterge rândul din baza de date
         await Documente_Solicitari.destroy({
-            where: {
-                id_document: id_document
-            }
+            where: { id_document }
         });
 
-        res.status(201).json({
-            message: "Document sters"
-        });
+        res.status(201).json({ message: "Document șters cu succes." });
+
     } catch (err) {
         console.error('Eroare la deleteDocument:', err);
-        res.status(500).json({ err: err.message });
+        res.status(500).json({ message: "Eroare la ștergerea documentului", error: err.message });
     }
 }
 
@@ -388,30 +409,24 @@ const updateStatusSolicitare = async (req, res) => {
 const downloadDocument = async (req, res) => {
     try {
         const { id_document } = req.query;
-        const document = await Documente_Solicitari.findByPk(id_document,
-            {
-                attributes: ['mime_type', 'file_data', 'file_name'],
-            }
-        );
+
+        const document = await Documente_Solicitari.findByPk(id_document, {
+            attributes: ['mime_type', 'file_name', 'file_path'],
+        });
 
         if (!document) {
-            return res.status(404).json({ message: "Documentul nu a fost gasita" });
+            return res.status(404).json({ message: "Documentul nu a fost găsit." });
         }
 
-        if (!document.file_data) {
-            return res.status(404).json({ message: "Continutul documentului lipseste" });
+        if (!document.file_path || !fs.existsSync(document.file_path)) {
+            return res.status(404).json({ message: "Fișierul nu există pe server." });
         }
+        const fileName = document.file_name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
 
-        let filename = document.file_name;
-        filename = filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-
-
-        // Modificăm modul în care setăm numele fișierului în header
         res.setHeader('Content-Type', document.mime_type || 'application/octet-stream');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-        res.setHeader('Content-Length', document.file_data.length);
-
-        res.send(document.file_data);
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        res.download(document.file_path);
+        
     } catch (err) {
         console.error('Eroare la downloadDocument: ', err);
         res.status(500).json({ message: "Eroare la downloadDocument", error: err.message });

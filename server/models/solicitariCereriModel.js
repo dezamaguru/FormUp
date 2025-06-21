@@ -35,10 +35,6 @@ module.exports = (sequelize, DataTypes) => {
         file_name: {
             type: DataTypes.STRING(255),
             //allowNull: false
-        },
-        file_data: {
-            type: DataTypes.BLOB("long"), // Echivalent pentru LONGBLOB
-            //allowNull: false 
         }
     }, {
         tableName: 'Solicitari_cereri'

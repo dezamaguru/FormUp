@@ -1,6 +1,8 @@
 const { Cereri, Sequelize } = require('../models');
 const { Users } = require('../models');
 const EmailService = require("../service/EmailService");
+const path = require("path");
+const fs = require("fs");
 
 const getAllCereri = async (req, res) => {
   try {
@@ -61,12 +63,20 @@ const uploadCerere = async (req, res) => {
     }
 
     // Creăm cererea și salvăm rezultatul
+    const timestamp = Date.now();
+    const sanitizedTitle = title.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+    const fileName = `${sanitizedTitle}_${timestamp}_${file.originalname}`;
+    const filePath = path.join(__dirname, "../uploads/cereri", fileName);
+
+    await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+    await fs.promises.writeFile(filePath, file.buffer);
+
     const newCerere = await Cereri.create({
       title,
       type,
       mime_type: file.mimetype,
       filename: file.originalname,
-      file_data: file.buffer,
+      file_path: filePath
     });
 
     // Găsește toți secretarii
@@ -118,7 +128,7 @@ const downloadCerere = async (req, res) => {
   try {
 
     const cerere = await Cereri.findOne({
-      attributes: ['title','filename', 'mime_type', 'file_data'],
+      attributes: ['title', 'filename', 'mime_type', 'file_data'],
       where: {
         id_cerere: req.params.id,
       }
@@ -128,16 +138,11 @@ const downloadCerere = async (req, res) => {
       return res.status(404).json({ message: "Fișierul nu a fost găsit." });
     }
 
-    if (!cerere.file_data) {
-      return res.status(404).json({ message: "Conținutul fișierului lipsește." });
+    if (!cerere.file_path || !fs.existsSync(cerere.file_path)) {
+      return res.status(404).json({ message: "Fișierul nu a fost găsit pe disc." });
     }
 
-    // Modificăm modul în care setăm numele fișierului în header
-    res.setHeader('Content-Type', cerere.mime_type || 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename="${cerere.title}"`);
-    res.setHeader('Content-Length', cerere.file_data.length);
-    // Trimitem datele
-    res.send(cerere.file_data);
+    res.download(cerere.file_path, cerere.filename);
   } catch (err) {
     console.error('Eroare la descărcare:', err);
     res.status(500).json({ message: "Eroare la descărcarea fișierului", error: err.message });
@@ -180,36 +185,62 @@ const modifyCerere = async (req, res) => {
         .json({ message: "Nu s-a ales tipul cererii!" });
     }
 
-    const cerereModificata = await Cereri.update({
+    const cerereExistenta = await Cereri.findByPk(req.params.id);
+    if (!cerereExistenta) {
+      return res.status(404).json({ message: "Cererea nu a fost găsită!" });
+    }
+
+    // Ștergem fișierul vechi dacă există
+    if (cerereExistenta.file_path && fs.existsSync(cerereExistenta.file_path)) {
+      await fs.promises.unlink(cerereExistenta.file_path);
+    }
+
+    // Construim calea pentru noul fișier
+    const timestamp = Date.now();
+    const sanitizedTitle = title.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+    const fileName = `${sanitizedTitle}_${timestamp}_${file.originalname}`;
+    const filePath = path.join(__dirname, "../uploads/cereri", fileName);
+
+    await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+    await fs.promises.writeFile(filePath, file.buffer);
+
+    // Update în baza de date
+    await Cereri.update({
       title,
       type,
       mime_type: file.mimetype,
       filename: file.originalname,
-      file_data: file.buffer,
+      file_path: filePath
     }, {
-      where: {
-        id_cerere: req.params.id,
-      }
+      where: { id_cerere: req.params.id }
     });
 
     res.status(201).json({
-      message: "Fișier salvat cu succes!",
+      message: "Fișier modificat cu succes!",
       cerere: {
-        id_cerere: cerereModificata.id_cerere,
-        title: cerereModificata.title,
-        type: cerereModificata.type,
-        filename: cerereModificata.filename
+        id_cerere: req.params.id,
+        title,
+        type,
+        filename: file.originalname
       }
     });
+
+
   } catch (err) {
     console.error('Eroare la modifyCerere:', err);
-    res.status(500).json({ message: "Eroare la încărcarea fișierului", error: err.message });
+    res.status(500).json({ message: "Eroare la modificarea cererii", error: err.message });
   }
 }
 
 const deleteCerere = async (req, res) => {
   try {
     const { id_cerere } = req.body;
+
+    const cerere = await Cereri.findByPk(id_cerere);
+    if (cerere?.file_path && fs.existsSync(cerere.file_path)) {
+      await fs.promises.unlink(cerere.file_path);
+    }
+
     await Cereri.destroy({
       where: {
         id_cerere: id_cerere
