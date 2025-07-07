@@ -20,7 +20,7 @@ const useFirebaseNotifications = () => {
         { position: "top-right" }
       );
     });
-    return () => unsubscribe(); // cleanup on unmount
+    return () => unsubscribe(); 
   }, []);
 };
 

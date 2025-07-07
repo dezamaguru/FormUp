@@ -18,10 +18,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    mime_type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     file_path: {
       type: DataTypes.STRING(512),
       allowNull: false,

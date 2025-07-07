@@ -1,34 +1,25 @@
 import './StudentPage.css';
 import SideBar from '../SideBar/SideBar';
 import { useEffect, useState } from 'react';
-import { generateToken } from "../Notificari/firebase";
 import { ToastContainer, toast } from 'react-toastify';
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
-import Map from '../Maps/GoogleMaps';
 import { useNavigate } from "react-router-dom";
+import GoogleMapComponent from '../Maps/CustomMap';
+import { format } from 'date-fns';
+import { ro } from 'date-fns/locale';
 
 function StudentPage() {
-  useFirebaseNotifications();
   const axiosPrivate = useAxiosPrivate();
-  const [fcmToken, setFcmToken] = useState("");
+  const [user, setUser] = useState();
   const [notificari, setNotificari] = useState("");
   const navigate = useNavigate();
 
-  const fetchFcmToken = async () => {
+  const getUser = async () => {
     try {
-      const token = await generateToken();
-      console.log("Token FCM generat:", token);
-
-      const response = await axiosPrivate.post('/users/fcm-token', { token });
-      console.log("Răspuns la salvarea token-ului:", response.data);
-
-      setFcmToken(token);
+      const user = await axiosPrivate.get('/users/getUser');
+      setUser(user.data);
     } catch (err) {
-      console.error("Eroare la generarea/salvarea token-ului FCM:", err);
-      if (err.message === "Notification not granted") {
-        console.error("Utilizatorul nu a acordat permisiunea pentru notificări");
-      }
+      console.log("Eroare la preluare user: ", err);
     }
   }
 
@@ -39,12 +30,20 @@ function StudentPage() {
     } catch (err) {
       console.error("Error getting notifications: ", err);
     }
+  }
 
+  const modificaStare = async (id_notificare) => {
+    try {
+      await axiosPrivate.post(`/notificari/mark-as-read/${id_notificare}`);
+      getNotificari();
+    } catch (err) {
+      console.error("Eroare la marcarea notificării ca citită:", err);
+    }
   }
 
   useEffect(() => {
-    fetchFcmToken();
     getNotificari();
+    getUser();
   }, []);
 
   const handleDelete = async (id) => {
@@ -62,7 +61,6 @@ function StudentPage() {
     }
   }
 
-
   return (
     <div className="student-page">
       <ToastContainer />
@@ -73,28 +71,33 @@ function StudentPage() {
       <main className="main-content">
         {/* Top bar */}
         <header className="header">
-          <h1>Welcome, Student!</h1>
+          <h1>Welcome, {user?.lastName} {user?.firstName}!</h1>
           <div className="header-buttons">
             <button className="icon-button" aria-label="Notifications">🔔</button>
             <button className="icon-button avatar-button" aria-label="Profile">👤</button>
           </div>
         </header>
 
-        {/* Dashboard sections */}
         <div className="dashboard">
-          {/* Classes */}
           <section className="card classes" style={{ gridArea: "classes" }}>
             <h3>Notificari</h3>
             {Array.isArray(notificari) && notificari.length > 0 ? (
               (notificari.map((notificare) => (
-                <div className="class-card"
+                <div className={`notificare-card ${!notificare.citita ? 'necitita' : ''}`}
                   key={notificare.id_notificare}
-                  onClick={() => navigate(notificare.link_destinatie)}
+                  onClick={() => {
+                    navigate(notificare.link_destinatie)
+                    modificaStare(notificare.id_notificare)
+                  }
+                  }
                 >
                   <strong>{notificare.titlu}</strong>
                   <p>{notificare.mesaj}</p>
-                  <small>{notificare.creat_la}</small>
-                  <button
+                  <small>
+                    {format(new Date(notificare.creat_la), "dd MMMM yyyy, HH:mm", { locale: ro })}
+                  </small>
+
+                  <button className='delete-btn'
                     onClick={(e) => {
                       e.stopPropagation(); // oprește propagarea către .class-card
                       handleDelete(notificare.id_notificare);
@@ -107,7 +110,7 @@ function StudentPage() {
           </section>
 
           <section className="card news" style={{ gridArea: "news" }}>
-            <Map />
+            <GoogleMapComponent />
           </section>
 
         </div>

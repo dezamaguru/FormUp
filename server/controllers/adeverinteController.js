@@ -136,8 +136,7 @@ const adaugaSolicitare = async (req, res) => {
             userId: req.userId,
             nume_student: `${student.lastName} ${student.firstName}`,
             status: "Aprobata",
-            filename: uniqueFilename,
-            mime_type: "application/pdf"
+            filename: uniqueFilename
         });
 
         //creaza notificari

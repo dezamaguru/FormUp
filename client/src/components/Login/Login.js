@@ -4,9 +4,16 @@ import useAuth from "../../hooks/useAuth";
 import './Login.css';
 import axios from '../../api/axios';
 import { useNavigate, useLocation } from 'react-router-dom';
+import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
+import { generateToken } from "../Notificari/firebase";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 const LOGIN_URL = '/login';
 
+
 function Login() {
+    useFirebaseNotifications();
+    const axiosPrivate = useAxiosPrivate();
+    const [fcmToken, setFcmToken] = useState("");
     const { setAuth } = useAuth();
 
     const navigate = useNavigate();
@@ -19,6 +26,23 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errMsg, setErrMsg] = useState('');
+
+    const fetchFcmToken = async () => {
+        try {
+            const token = await generateToken();
+            console.log("Token FCM generat");
+
+            const response = await axiosPrivate.post('/users/fcm-token', { token });
+            console.log("Răspuns la salvarea token-ului:", response.data);
+
+            setFcmToken(token);
+        } catch (err) {
+            console.error("Eroare la generarea/salvarea token-ului FCM:", err);
+            if (err.message === "Notification not granted") {
+                console.error("Utilizatorul nu a acordat permisiunea pentru notificări");
+            }
+        }
+    }
 
     useEffect(() => {
         userRef.current.focus();
@@ -46,6 +70,7 @@ function Login() {
             setEmail('');
             setPassword('');
             navigate(from, { replace: true });
+            fetchFcmToken();
 
         } catch (error) {
             if (!error?.response) {

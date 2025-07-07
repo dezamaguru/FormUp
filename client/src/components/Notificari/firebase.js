@@ -1,6 +1,5 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getMessaging, getToken, onMessage } from "firebase/messaging"
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -9,18 +8,17 @@ import { getMessaging, getToken, onMessage } from "firebase/messaging"
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyA53b7dJL8zAmzUXwsZZ21WVDU2a4zs7OU",
-  authDomain: "formup-8d3b9.firebaseapp.com",
-  projectId: "formup-8d3b9",
-  storageBucket: "formup-8d3b9.firebasestorage.app",
-  messagingSenderId: "190616113374",
-  appId: "1:190616113374:web:65867a4d846e98a346f24f",
-  measurementId: "G-FHTL1J1SLW"
+  apiKey: "AIzaSyD7P42shpHOpMJi_j6CMLaPFtiIX6XLgnM",
+  authDomain: "formup-462219.firebaseapp.com",
+  projectId: "formup-462219",
+  storageBucket: "formup-462219.firebasestorage.app",
+  messagingSenderId: "214551502188",
+  appId: "1:214551502188:web:a67d13612b2ebcaad3e749",
+  measurementId: "G-YZ80MVTF4K"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 export const messaging = getMessaging(app);
 
 export const generateToken = async () => {

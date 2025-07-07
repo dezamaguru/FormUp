@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         tip_adeverinta: {
             type: DataTypes.STRING(255),
-            allowNull: false 
+            allowNull: false
         },
         userId: {
             type: DataTypes.INTEGER,
@@ -20,21 +20,21 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'CASCADE' // Șterge solicitările dacă utilizatorul este șters
         },
-        nume_student:{
+        nume_student: {
             type: DataTypes.STRING(255),
-            allowNull: false 
+            allowNull: false
         },
-        status:{
-            type: DataTypes.ENUM('Trimisa', 'Procesare','Aprobata', 'Respinsa'),
-            allowNull: false 
+        status: {
+            type: DataTypes.ENUM('Trimisa', 'Procesare', 'Aprobata', 'Respinsa'),
+            allowNull: false
         },
         filename: {
             type: DataTypes.STRING(255),
             //allowNull: false
         },
-        mime_type:{
-            type: DataTypes.STRING(100),
-            //allowNull: false 
+        file_path: {
+            type: DataTypes.STRING(255),
+            //allowNull: false
         }
     }, {
         tableName: 'Solicitari_adeverinte'

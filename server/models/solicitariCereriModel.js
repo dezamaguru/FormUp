@@ -27,14 +27,6 @@ module.exports = (sequelize, DataTypes) => {
         status:{
             type: DataTypes.ENUM('Trimisa', 'Procesare','Aprobata', 'Respinsa'),
             allowNull: false 
-        },
-        mime_type:{
-            type: DataTypes.STRING(100),
-            //allowNull: false 
-        },
-        file_name: {
-            type: DataTypes.STRING(255),
-            //allowNull: false
         }
     }, {
         tableName: 'Solicitari_cereri'

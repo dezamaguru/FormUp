@@ -130,7 +130,6 @@ const uploadDocumenteSolicitareCerere = async (req, res) => {
                 return Documente_Solicitari.create({
                     id_solicitare: solicitare.id_solicitare,
                     file_name: file.originalname,
-                    mime_type: file.mimetype,
                     file_path: filePath,
                     uploadedBy: req.userId,
                     destinatar: req.body.destinatar || null
@@ -411,7 +410,7 @@ const downloadDocument = async (req, res) => {
         const { id_document } = req.query;
 
         const document = await Documente_Solicitari.findByPk(id_document, {
-            attributes: ['mime_type', 'file_name', 'file_path'],
+            attributes: ['file_name', 'file_path'],
         });
 
         if (!document) {
@@ -423,7 +422,7 @@ const downloadDocument = async (req, res) => {
         }
         const fileName = document.file_name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
 
-        res.setHeader('Content-Type', document.mime_type || 'application/octet-stream');
+        //res.setHeader('Content-Type', document.mime_type || 'application/octet-stream');
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
         res.download(document.file_path);
         

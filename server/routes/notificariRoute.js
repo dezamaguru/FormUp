@@ -6,5 +6,7 @@ const notificariController = require('../controllers/notificariController');
 router.post('/upload', verifyJWT, notificariController.createNotificare);
 router.get('/', verifyJWT, notificariController.getNotificari);
 router.post('/delete', verifyJWT, notificariController.deleteNotificare);
+router.post('/mark-as-read/:id_notificare', verifyJWT, notificariController.markAsRead);
+
 
 module.exports = router;
