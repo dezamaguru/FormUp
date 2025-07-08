@@ -1,4 +1,4 @@
-import '../StudentPage/StudentPage.css';
+import './SecretarPage.css';
 import SideBar from "../SideBar/SideBar";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useEffect, useState } from 'react';
@@ -7,23 +7,12 @@ import GoogleMapComponent from '../Maps/CustomMap';
 import { useNavigate } from "react-router-dom";
 import { format } from 'date-fns';
 import { ro } from 'date-fns/locale';
+import Header from '../Header/Header';
 
 function SecretarRole() {
   const axiosPrivate = useAxiosPrivate();
   const [notificari, setNotificari] = useState("");
   const navigate = useNavigate();
-  const [user, setUser] = useState();
-
-  const getUser = async () => {
-
-    try {
-      const user = await axiosPrivate.get('/users/getUser');
-      setUser(user.data);
-      console.log("User:", user.firstName, user.lastName);
-    } catch (err) {
-      console.log("Eroare la preluare user: ", err);
-    }
-  }
 
   const getNotificari = async () => {
     try {
@@ -33,6 +22,15 @@ function SecretarRole() {
       console.error("Error getting notifications: ", err);
     }
 
+  }
+
+  const modificaStare = async (id_notificare) => {
+    try {
+      await axiosPrivate.post(`/notificari/mark-as-read/${id_notificare}`);
+      getNotificari();
+    } catch (err) {
+      console.error("Eroare la marcarea notificării ca citită:", err);
+    }
   }
 
   const handleDelete = async (id) => {
@@ -52,45 +50,40 @@ function SecretarRole() {
 
   useEffect(() => {
     getNotificari();
-    getUser();
   }, []);
 
   return (
     <div className="student-page">
       <ToastContainer />
-      {/* Sidebar */}
       <SideBar />
 
-      {/* Main Content */}
       <main className="main-content">
-        {/* Top bar */}
-        <header className="header">
-          <h1>Welcome, {user?.lastName} {user?.firstName}!</h1>
-          <div className="header-buttons">
-            <button className="icon-button" aria-label="Notifications">🔔</button>
-            <button className="icon-button avatar-button" aria-label="Profile">👤</button>
-          </div>
-        </header>
+        <Header />
 
         {/* Dashboard sections */}
         <div className="dashboard">
-          {/* Classes */}
-          <section className="card " style={{ gridArea: "classes" }}>
+
+          <section className="card classes" style={{ gridArea: "classes" }}>
             <h3>Notificari</h3>
             {Array.isArray(notificari) && notificari.length > 0 ? (
               (notificari.map((notificare) => (
                 <div className={`notificare-card ${!notificare.citita ? 'necitita' : ''}`}
                   key={notificare.id_notificare}
-                  onClick={() => navigate(notificare.link_destinatie)}
+                  onClick={() => {
+                    navigate(notificare.link_destinatie)
+                    modificaStare(notificare.id_notificare)
+                  }
+                  }
                 >
                   <strong>{notificare.titlu}</strong>
                   <p>{notificare.mesaj}</p>
                   <small>
                     {format(new Date(notificare.creat_la), "dd MMMM yyyy, HH:mm", { locale: ro })}
                   </small>
+
                   <button className='delete-btn'
                     onClick={(e) => {
-                      e.stopPropagation(); // oprește propagarea către .class-card
+                      e.stopPropagation();
                       handleDelete(notificare.id_notificare);
                     }}>Sterge</button>
                 </div>

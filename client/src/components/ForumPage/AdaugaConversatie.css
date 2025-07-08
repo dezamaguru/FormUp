@@ -25,3 +25,34 @@
 .form-adauga-conversatie button:hover {
   background: #2563eb;
 }
+
+.form-adauga-conversatie input[type="email"],
+.form-adauga-conversatie input[type="text"] {
+  padding: 10px;
+  margin-bottom: 0.5rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  width: 100%;
+}
+
+.sugestii-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 10;
+  position: absolute;
+}
+
+.sugestii-list li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.sugestii-list li:hover {
+  background: #e0f2fe;
+}

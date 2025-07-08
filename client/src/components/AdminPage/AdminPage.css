@@ -1,0 +1,37 @@
+.admin-home-page {
+  display: flex;
+}
+
+.admin-home-content {
+  flex: 1;
+  padding: 2rem;
+}
+
+.admin-info-card {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 1.5rem;
+}
+
+.admin-info-card p {
+  margin: 6px 0;
+  font-size: 1rem;
+  color: #334155;
+}
+
+.admin-actions ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.admin-actions li {
+  background: #e2e8f0;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #1e293b;
+}

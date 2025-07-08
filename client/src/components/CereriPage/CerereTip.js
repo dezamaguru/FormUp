@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 
-function CerereTip() {
+function CerereTip({ onCerereTipModificata }) {
     useFirebaseNotifications();
     const { id } = useParams();
     const [cerereTip, setCerereTip] = useState(null);
@@ -32,55 +32,6 @@ function CerereTip() {
 
         getOneCerere();
     }, [id, axiosPrivate]);
-
-
-    // const handleDownload = async (id, title) => {
-    //     try {
-    //         const res = await axiosPrivate.get(`/cereri/${id}/download`, {
-    //             responseType: "blob",
-    //         });
-
-    //         if (!res.data) {
-    //             throw new Error("Nu s-au primit date de la server");
-    //         }
-
-    //         const disposition = res.headers["content-disposition"];
-    //         let filename;
-
-    //         if (disposition) {
-    //             const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-    //             const matches = filenameRegex.exec(disposition);
-    //             if (matches != null && matches[1]) {
-    //                 filename = matches[1].replace(/['"]/g, "");
-    //             }
-    //         }
-
-    //         if (!filename) {
-    //             filename = `cerere_${id}`;
-    //         }
-
-    //         const blob = new Blob([res.data], {
-    //             type: res.headers["content-type"] || "application/octet-stream",
-    //         });
-
-    //         const url = window.URL.createObjectURL(blob);
-    //         const a = document.createElement("a");
-    //         a.style.display = "none";
-    //         a.href = url;
-    //         a.download = title;
-
-    //         document.body.appendChild(a);
-    //         a.click();
-
-    //         window.URL.revokeObjectURL(url);
-    //         document.body.removeChild(a);
-    //     } catch (err) {
-    //         console.error("Eroare la descărcare:", err);
-    //         alert(
-    //             "A apărut o eroare la descărcarea fișierului. Vă rugăm să încercați din nou."
-    //         );
-    //     }
-    // };
 
     const handleDownload = async (id, title) => {
         try {
@@ -168,23 +119,7 @@ function CerereTip() {
 
 
     const handleAddSolicitare = async (id) => {
-
-        // if (!file) {
-        //     return alert("Încarcă fișierul!");
-        // }
-
-        // const formData = new FormData();
-        // formData.append("file", file);
-
         try {
-            // const res = await axiosPrivate.post(`/cereri/${id}/upload`,
-            //     formData,
-            //     {
-            //         headers: {
-            //             "Content-Type": "multipart/form-data",
-            //         },
-            //     }
-            // );
 
             const res = await axiosPrivate.post(`/cereri/${id}/upload`);
             //const solicitare = await axiosPrivate.get(`cereri/solicitari/${id}`);
@@ -209,7 +144,6 @@ function CerereTip() {
         formData.append("type", type);
 
         try {
-
             const res = await axiosPrivate.post(`/cereri/${id}/modify`,
                 formData,
                 {
@@ -221,7 +155,9 @@ function CerereTip() {
             setFile(null);
             console.log("Solicitare adăugată cu succes!", res.data);
             alert("Fișier încărcat cu succes");
-
+            if (typeof onCerereTipModificata === 'function') {
+                onCerereTipModificata();
+            }
         } catch (err) {
             console.error("Eroare completă:", err);
             console.error("Răspuns server:", err.response?.data);
@@ -236,6 +172,9 @@ function CerereTip() {
                 id_cerere
             });
             console.log("Cerere tip stearsa");
+            if (typeof onCerereTipModificata === 'function') {
+                onCerereTipModificata();
+            }
         } catch (err) {
             console.error("Eroare completă:", err);
             console.error("Răspuns server:", err.response?.data);

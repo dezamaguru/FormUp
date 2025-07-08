@@ -5,6 +5,8 @@ import useAuth from "../../hooks/useAuth";
 import SideBar from "../SideBar/SideBar";
 import { ToastContainer, toast } from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
+import Header from '../Header/Header';
+import "./AdeverintaSolicitata.css"
 
 const AdeverintaSolicitata = () => {
   useFirebaseNotifications();
@@ -45,43 +47,6 @@ const AdeverintaSolicitata = () => {
     }
   };
 
-
-  const handleUploadAdeverintaSolicitata = async (e) => {
-    e.preventDefault();
-    if (!file) return alert("Incarca fisierul!");
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await axiosPrivate.post(
-        `/adeverinte/${id}/upload`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      setFile(null);
-      console.log("Fisierul incarcat:", res.data);
-      getOneAdeverinta();
-
-      toast.success(
-        <div>
-          <div>
-            Notification sent
-          </div>
-        </div>,
-        { position: 'top-right' }
-      )
-
-      //alert("Fisier incarcat cu succes");
-    } catch (err) {
-      console.error("Eroare completă:", err);
-      console.error("Răspuns server:", err.response?.data);
-      alert(err.response?.data?.message || "Eroare la upload");
-    }
-  };
 
   const handleDownloadAdeverinta = async () => {
     try {
@@ -135,18 +100,7 @@ const AdeverintaSolicitata = () => {
       <SideBar />
 
       <main className="main-content">
-        {/* Top bar */}
-        <header className="header">
-          <h1>Welcome!</h1>
-          <div className="header-buttons">
-            <button className="icon-button" aria-label="Notifications">
-              🔔
-            </button>
-            <button className="icon-button avatar-button" aria-label="Profile">
-              👤
-            </button>
-          </div>
-        </header>
+        <Header/>
 
         {auth?.type === "student" && (
           <div className="adeverinta-layout">
@@ -218,18 +172,6 @@ const AdeverintaSolicitata = () => {
                         {adeverinta.status}
                       </span>
                     </div>
-
-                    {/* <form
-                      onSubmit={handleUploadAdeverintaSolicitata}
-                      style={{ marginBottom: "20px" }}
-                    >
-                      <input
-                        type="file"
-                        onChange={(e) => setFile(e.target.files[0])}
-                        required
-                      />
-                      <button type="submit">Incarca adeverinta</button>
-                    </form> */}
                   </>
                 ) : (
                   <p>Nu exista detalii pentru aceasta deverinta</p>

@@ -277,7 +277,7 @@ const getAllSolicitariCereri = async (req, res) => {
                 where: {
                     userId: req.userId,
                 },
-                include: [{ model: Cereri, attributes: ['title'] }],
+                include: [{ model: Cereri, attributes: ['title', 'type'] }],
                 order: [['createdAt', 'DESC']],
                 limit,
                 offset
@@ -425,7 +425,7 @@ const downloadDocument = async (req, res) => {
         //res.setHeader('Content-Type', document.mime_type || 'application/octet-stream');
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
         res.download(document.file_path);
-        
+
     } catch (err) {
         console.error('Eroare la downloadDocument: ', err);
         res.status(500).json({ message: "Eroare la downloadDocument", error: err.message });

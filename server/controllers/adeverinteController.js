@@ -285,7 +285,7 @@ const uploadAdeverintaSolicitata = async (req, res) => {
 const downloadAdeverintaSolicitata = async (req, res) => {
   try {
     const adeverinta = await Solicitari_Adeverinte.findByPk(req.params.id, {
-      attributes: ['tip_adeverinta', 'mime_type', 'filename']
+      attributes: ['tip_adeverinta', 'filename']
     });
 
     if (!adeverinta || !adeverinta.filename) {

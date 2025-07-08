@@ -31,10 +31,6 @@ module.exports = (sequelize, DataTypes) => {
         filename: {
             type: DataTypes.STRING(255),
             //allowNull: false
-        },
-        file_path: {
-            type: DataTypes.STRING(255),
-            //allowNull: false
         }
     }, {
         tableName: 'Solicitari_adeverinte'

@@ -55,20 +55,31 @@ const getAllConversatii = async (req, res) => {
 }
 
 const uploadConversatie = async (req, res) => {
+    const { titlu, emailStudent } = req.body;
+
     try {
+        let targetStudentId = null;
+
+        if (req.type === 'secretar' && emailStudent) {
+            const student = await Users.findOne({ where: { email: emailStudent, type: 'student' } });
+            if (!student) return res.status(404).json({ message: "Studentul nu a fost găsit" });
+            targetStudentId = student.userId;
+        }
+
         const user = await Users.findByPk(req.userId);
         if (!user) {
             return res.status(404).json({ message: "User not found in uploadConversatie" });
         }
 
         const { titlu } = req.body;
+
         const newConversatie = await Conversatii.create({
             userId: req.userId,
             title: titlu,
             program_studiu: user.program_studiu,
             an_studiu: user.an_studiu,
-            id_student: req.type === 'student' ? req.userId : null,
-            id_secretar: req.type === 'secretar' ? req.userId : null
+            id_secretar: req.type === 'secretar' ? req.userId : null,
+            id_student: req.type === 'secretar' ? targetStudentId : null
         });
 
         res.status(201).json({
@@ -88,7 +99,7 @@ const getAllMessages = async (req, res) => {
     try {
 
         const mesaje = await Mesaje.findAll({
-            attributes: ['id_mesaj', 'id_conversatie', 'id_expeditor', 'type', 'continut'],
+            attributes: ['id_mesaj', 'id_conversatie', 'id_expeditor', 'type', 'continut', 'createdAt'],
             where: {
                 id_conversatie: req.params.id
             }

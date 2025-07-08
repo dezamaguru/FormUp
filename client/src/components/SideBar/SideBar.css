@@ -1,13 +1,21 @@
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+        /* sau transformă-l într-un drawer lateral */
+    }
+}
+
 .sidebar {
     width: 250px;
+    min-height: calc(100vh - 2rem);
     background: white;
     padding: 2rem 1rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: center;
     border-radius: 30px;
     margin: 1rem;
-    align-items: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
@@ -41,4 +49,10 @@
     border-radius: 15px;
     cursor: pointer;
     width: 50%;
+}
+
+.active-link {
+    background: #e0f2fe;
+    color: #0c4a6e;
+    font-weight: bold;
 }

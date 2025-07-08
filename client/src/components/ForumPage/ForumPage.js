@@ -7,6 +7,9 @@ import AdaugaConversatie from "./AdaugaConversatie";
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
+import Header from "../Header/Header";
+import { format } from "date-fns";
+import { ro } from "date-fns/locale";
 
 const ForumPage = () => {
     useFirebaseNotifications();
@@ -18,31 +21,21 @@ const ForumPage = () => {
     const [mesage, setMesaje] = useState([]);
     const [titluConversatie, setTitluConversatie] = useState("");
 
-    useEffect(() => {
-        let isMounted = true;
-        const controller = new AbortController();
-
-        const getConversatii = async () => {
-            try {
-                const res = await axiosPrivate.get("/inbox", {
-                    signal: controller.signal,
-                });
-                if (isMounted) {
-                    setConversatii(res.data);
-                }
-            } catch (err) {
-                if (err.name !== "CanceledError") {
-                    console.error(err.response?.data);
-                }
+    // Functie pentru refresh conversatii
+    const getConversatii = async () => {
+        try {
+            const res = await axiosPrivate.get("/inbox");
+            setConversatii(res.data);
+        } catch (err) {
+            if (err.name !== "CanceledError") {
+                console.error(err.response?.data);
             }
-        };
+        }
+    };
 
+    useEffect(() => {
         getConversatii();
-
-        return () => {
-            isMounted = false;
-            controller.abort();
-        };
+        // eslint-disable-next-line
     }, [axiosPrivate]);
 
     const getMesaje = async () => {
@@ -92,7 +85,7 @@ const ForumPage = () => {
                 conversatii.map((conversatie) => (
                     <div
                         key={conversatie.id_conversatie}
-                        className="friends"
+                        className={`friends ${selectedConv === conversatie.id_conversatie ? 'active' : ''}`}
                         onClick={() => {
                             setSelectedConv(conversatie.id_conversatie);
                             setTitluConversatie(conversatie.title);
@@ -101,7 +94,7 @@ const ForumPage = () => {
                         <div className="friends-credent">
                             <span className="friends-name">{conversatie.title}</span>
                             <span className="friends-message">
-                                <strong>                                {conversatie.User ? `${conversatie.User.firstName} ${conversatie.User.lastName}` : '—'}</strong>
+                                <strong>{conversatie.User ? `${conversatie.User.firstName} ${conversatie.User.lastName}` : '—'}</strong>
                             </span>
                             <span className="friends-message">{conversatie.User?.facultate}</span>
                             <span className="friends-message">An studiu:{conversatie.User?.an_studiu}</span>
@@ -117,23 +110,26 @@ const ForumPage = () => {
     const renderChat = () => (
         <div className="chat-area">
             {selectedConv === 0 ? (
-                <AdaugaConversatie />
+                <AdaugaConversatie onConversatieAdaugata={getConversatii} />
+            ) : mesage.length > 0 ? (
+                mesage.map((mesaj, index) => {
+                    const isOwn = mesaj.type === auth.type;
+                    const bubbleClass = isOwn ? "your-chat-balloon" : "friends-chat-balloon";
+                    const wrapperClass = isOwn ? "your-chat" : "friends-chat";
+
+                    return (
+                        <div className={wrapperClass} key={index}>
+                            <div className={bubbleClass}>
+                                <div>{mesaj.continut}</div>
+                                <div className="msg-footer">
+                                    {format(new Date(mesaj.createdAt), "dd MMM yyyy, HH:mm", { locale: ro })}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })
             ) : (
-                mesage.length > 0 ? (
-                    mesage.map((mesaj, index) => (
-                        mesaj.type === auth.type ? (
-                            <div className="your-chat" key={index}>
-                                <p className="your-chat-balloon">{mesaj.continut}</p>
-                            </div>
-                        ) : (
-                            <div className="friends-chat" key={index}>
-                                <p className="friends-chat-balloon">{mesaj.continut}</p>
-                            </div>
-                        )
-                    ))
-                ) : (
-                    <p>Nu exista mesaje</p>
-                )
+                <p>Nu exista mesaje</p>
             )}
         </div>
     );
@@ -144,18 +140,12 @@ const ForumPage = () => {
             <SideBar />
 
             <main className="main-content">
-                <header className="header">
-                    <h1>Welcome!</h1>
-                    <div className="header-buttons">
-                        <button className="icon-button" aria-label="Notifications">🔔</button>
-                        <button className="icon-button avatar-button" aria-label="Profile">👤</button>
-                    </div>
-                </header>
+                <Header />
 
                 <div className="app">
                     <section className="main-left">
                         <div className="header-left">
-                            <AdaugaConversatie />
+                            <AdaugaConversatie onConversatieAdaugata={getConversatii} />
                         </div>
                         {renderConversations()}
                     </section>

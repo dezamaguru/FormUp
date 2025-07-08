@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import "./App.css"
 import Login from '../components/Login/Login';
 import Home from '../components/Home/Home';
 import AddUser from '../components/Users/AddUser';
@@ -9,7 +10,6 @@ import PersistLogin from '../components/PersistLogin';
 import Cereri from '../components/CereriPage/CereriPage';
 import Adevererinte from '../components/AdeverintePage/AdeverintePage';
 import AdeverintaSolicitata from '../components/AdeverintePage/AdeverintaSolicitata';
-import CerereTip from '../components/CereriPage/CerereTip';
 import SolicitareCerere from '../components/CereriPage/SolicitareCerere';
 import ForumPage from '../components/ForumPage/ForumPage';
 import useFirebaseNotifications from "../hooks/useFirebaseNotifications";
@@ -27,7 +27,7 @@ function App() {
           <Route path='/' element={<Login />} />
           <Route element={<PersistLogin />}>
 
-            <Route element={<RequireAuth />}>  {/*sends straight to login page if not logged in*/}
+            <Route element={<RequireAuth />}>
 
               <Route path='/home' element={<Home />} />
               <Route path='/adduser' element={<AddUser />} />
@@ -35,7 +35,6 @@ function App() {
               <Route path='/cereri' element={<Cereri />} />
               <Route path='/adeverinte' element={<Adevererinte />} />
               <Route path='/adeverinte/:id' element={<AdeverintaSolicitata />} />
-              <Route path='/cereri/:id' element={<CerereTip />} />
               <Route path="/cereri/solicitari/:id" element={<SolicitareCerere />} />
               <Route path="/inbox" element={<ForumPage />} />
               <Route path='/dashboard' element={<Dashboard />} />

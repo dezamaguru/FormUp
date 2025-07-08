@@ -7,21 +7,12 @@ import { useNavigate } from "react-router-dom";
 import GoogleMapComponent from '../Maps/CustomMap';
 import { format } from 'date-fns';
 import { ro } from 'date-fns/locale';
+import Header from '../Header/Header';
 
 function StudentPage() {
   const axiosPrivate = useAxiosPrivate();
-  const [user, setUser] = useState();
   const [notificari, setNotificari] = useState("");
   const navigate = useNavigate();
-
-  const getUser = async () => {
-    try {
-      const user = await axiosPrivate.get('/users/getUser');
-      setUser(user.data);
-    } catch (err) {
-      console.log("Eroare la preluare user: ", err);
-    }
-  }
 
   const getNotificari = async () => {
     try {
@@ -43,7 +34,6 @@ function StudentPage() {
 
   useEffect(() => {
     getNotificari();
-    getUser();
   }, []);
 
   const handleDelete = async (id) => {
@@ -64,19 +54,11 @@ function StudentPage() {
   return (
     <div className="student-page">
       <ToastContainer />
-      {/* Sidebar */}
       <SideBar />
 
       {/* Main Content */}
       <main className="main-content">
-        {/* Top bar */}
-        <header className="header">
-          <h1>Welcome, {user?.lastName} {user?.firstName}!</h1>
-          <div className="header-buttons">
-            <button className="icon-button" aria-label="Notifications">🔔</button>
-            <button className="icon-button avatar-button" aria-label="Profile">👤</button>
-          </div>
-        </header>
+        <Header />
 
         <div className="dashboard">
           <section className="card classes" style={{ gridArea: "classes" }}>

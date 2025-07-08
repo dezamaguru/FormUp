@@ -1,12 +1,12 @@
 import './SolicitareCerere.css';
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { useNavigate, useLocation } from "react-router-dom";
 import SideBar from "../SideBar/SideBar";
 import { useParams } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { ToastContainer, toast } from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
+import Header from '../Header/Header';
 
 function SolicitareCerere() {
     useFirebaseNotifications();
@@ -25,6 +25,20 @@ function SolicitareCerere() {
     const [documente, setDocumente] = useState([]);
     const [cerere, setCerere] = useState("");
 
+    const getObservatii = async (signal) => {
+        try {
+            const res = await axiosPrivate.get(`/cereri/solicitari/${id}/observatii`,
+                signal ? { signal } : undefined)
+            setObservatii(res.data);
+        } catch (err) {
+            if (err.name === "CanceledError") {
+                console.log("Request canceled:", err.message);
+            } else {
+                console.error(err.res?.data);
+            }
+        }
+    }
+
     useEffect(() => {
         let isMounted = true;
         const controller = new AbortController();
@@ -34,7 +48,6 @@ function SolicitareCerere() {
                 const response = await axiosPrivate.get(`/cereri/solicitari/${id}`, {
                     signal: controller.signal,
                 });
-
                 if (isMounted) {
                     setSolicitare(response.data);
                 }
@@ -47,27 +60,8 @@ function SolicitareCerere() {
             }
         };
 
-        const getObservatii = async () => {
-            try {
-                const res = await axiosPrivate.get(`/cereri/solicitari/${id}/observatii`,
-                    { signal: controller.signal })
-
-                if (isMounted) {
-                    //console.log("Solicitari primite:", res.data);
-                    setObservatii(res.data);
-                }
-            } catch (err) {
-                if (err.name === "CanceledError") {
-                    console.log("Request canceled:", err.message);
-                } else {
-                    console.error(err.res.data);
-                    //navigate("/", { state: { from: location }, replace: true });
-                }
-            }
-        }
-
         getSolicitare();
-        getObservatii();
+        getObservatii(controller.signal);
         getDocumente(controller.signal);
 
         return () => {
@@ -179,6 +173,8 @@ function SolicitareCerere() {
             const res = await axiosPrivate.post(`/cereri/solicitari/${id}/delete`, {
                 id_observatie: id_observatie
             })
+            // Reîncarcă lista de observații după ștergere
+            await getObservatii();
             console.log("Observatie stearsa", res.data);
         } catch (err) {
             console.log("Eroare la stergere obseravtie");
@@ -192,7 +188,6 @@ function SolicitareCerere() {
         const formData = new FormData();
         files.forEach(file => formData.append("files", file));
 
-        // Dacă secretarul încarcă, adaugă și destinatarul
         if (auth?.type === 'secretar' && solicitare?.User?.userId) {
             formData.append("destinatar", solicitare.User.userId);
         }
@@ -288,20 +283,8 @@ function SolicitareCerere() {
             <SideBar />
 
             {/* Main Content */}
-            <main className="main-content">
-                {/* Top bar */}
-                <header className="header">
-                    <h1>Welcome!</h1>
-                    <div className="header-buttons">
-                        <button className="icon-button" aria-label="Notifications">
-                            🔔
-                        </button>
-                        <button className="icon-button avatar-button" aria-label="Profile">
-                            👤
-                        </button>
-                    </div>
-                </header>
-
+            <main className="main-content-solicitare">
+                <Header />
                 {auth?.type === "student" && (
                     <div className="dashboard-solicitare" style={{ gridArea: "solicitare" }}>
                         <section className="card-solicitare">
@@ -309,7 +292,12 @@ function SolicitareCerere() {
                                 {solicitare ? (
                                     <div className="solicitare-card">
                                         <strong>Solicitare pentru {solicitare?.Cereri?.title}</strong>
-                                        <p>Status: {solicitare.status}</p>
+                                        <p>
+                                            Status:{" "}
+                                            <span className={`status-solicitare ${solicitare.status.toLowerCase()}`}>
+                                                {solicitare.status}
+                                            </span>
+                                        </p>
                                     </div>
                                 ) : (
                                     <p>Nu exista detalii pentru acesta solicitare</p>
@@ -415,10 +403,17 @@ function SolicitareCerere() {
                             <section className='detalii-container' style={{ gridArea: "detalii" }}>
                                 {solicitare ? (
                                     <div className="solicitare-card">
-                                        <p>Detalii solicitare</p>
+
                                         <strong>Solicitare pentru {solicitare?.Cereri?.title}</strong>
                                         <p>Student: {solicitare?.User?.firstName} {solicitare?.User?.lastName}</p>
-                                        <p>Status: {solicitare.status}</p>
+
+                                        <p>
+                                            Status:{" "}
+                                            <span className={`status-solicitare ${solicitare.status.toLowerCase()}`}>
+                                                {solicitare.status}
+                                            </span>
+                                        </p>
+
                                         <form onSubmit={(e) => handleStatusChange(e, solicitare.id_solicitare)}>
                                             <select
                                                 value={statusSolicitare}
@@ -429,7 +424,9 @@ function SolicitareCerere() {
                                                 <option value="Aprobata">Aprobata</option>
                                                 <option value="Respinsa">Respinsa</option>
                                             </select>
-                                            <button type='submit'>Update status</button>
+                                            <button
+                                                className='download-btn'
+                                                type='submit'>Update status</button>
                                         </form>
                                     </div>
                                 ) : (
@@ -527,7 +524,8 @@ function SolicitareCerere() {
                                         onChange={(e) => setContinut(e.target.value)}
                                     />
 
-                                    <button type='submit'>Submit</button>
+                                    <button className='download-btn'
+                                        type='submit'>Submit</button>
                                 </form>
                             </div>
 
@@ -555,8 +553,11 @@ function SolicitareCerere() {
                                                             onChange={(e) => setContinutModificat(e.target.value)}
                                                         />
 
-                                                        <button type='submit' >Salveaza</button>
                                                         <button
+                                                            className='download-btn'
+                                                            type='submit' >Salveaza</button>
+                                                        <button
+                                                            className='delete-btn'
                                                             onClick={() => setSelectedObservatieId(null)}>Anuleaza</button>
                                                     </form>
                                                 </div>
@@ -564,12 +565,15 @@ function SolicitareCerere() {
                                                 <>
                                                     <strong>{observatie.titlu}</strong>
                                                     <p>{observatie.continut}</p>
-                                                    <button onClick={() => {
-                                                        setSelectedObservatieId(observatie.id_observatie);
-                                                        setTitleModificat(observatie.titlu);
-                                                        setContinutModificat(observatie.continut);
-                                                    }}>Modifica</button>
                                                     <button
+                                                        className='download-btn'
+                                                        onClick={() => {
+                                                            setSelectedObservatieId(observatie.id_observatie);
+                                                            setTitleModificat(observatie.titlu);
+                                                            setContinutModificat(observatie.continut);
+                                                        }}>Modifica</button>
+                                                    <button
+                                                        className='delete-btn'
                                                         onClick={() => handleDeleteObservatie(observatie.id_observatie)}
                                                     >Sterge</button>
                                                 </>

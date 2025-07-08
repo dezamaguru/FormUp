@@ -9,6 +9,7 @@ import SideBar from "../SideBar/SideBar";
 import { ToastContainer } from 'react-toastify';
 import useFirebaseNotifications from "../../hooks/useFirebaseNotifications";
 import Paginator from "../Paginator/Paginator";
+import Header from '../Header/Header';
 
 function AdeverintePage() {
   useFirebaseNotifications();
@@ -57,40 +58,13 @@ function AdeverintePage() {
     };
   }, [axiosPrivate, navigate, location, page, pageSize]);
 
-  const handleClick = (id, currentStatus) => {
-    navigate(`/adeverinte/${id}`);
-
-    // if (currentStatus === "Procesare" || currentStatus === "Aprobata") {
-    //   console.log("Statusul nu poate fi schimbat deoarece este deja:", currentStatus);
-    //   return;
-    // }
-
-    // try {
-    //   const res = axiosPrivate.post(`/adeverinte/${id}/status`);
-    //   console.log("Status actualizat:", res.data);
-    // } catch (err) {
-    //   console.error("Eroare la actualizarea statusului:", err);
-    // }
-  };
-
   return (
     <div className="student-page">
       <ToastContainer />
       <SideBar />
 
       <main className="main-content">
-        {/* Top bar */}
-        <header className="header">
-          <h1>Welcome, Student!</h1>
-          <div className="header-buttons">
-            <button className="icon-button" aria-label="Notifications">
-              🔔
-            </button>
-            <button className="icon-button avatar-button" aria-label="Profile">
-              👤
-            </button>
-          </div>
-        </header>
+        <Header />
 
         {auth?.type === "student" && (
           <div>
@@ -138,7 +112,7 @@ function AdeverintePage() {
                   <div
                     key={adeverinta.id_adeverinta}
                     className="history-card"
-                    onClick={() => handleClick(adeverinta.id_adeverinta, adeverinta.status)}
+                    onClick={() => navigate(`/adeverinte/${adeverinta.id_adeverinta}`)}
                   >
                     <strong>{adeverinta.tip_adeverinta}</strong>
                     <p>{adeverinta.nume_student}</p>
