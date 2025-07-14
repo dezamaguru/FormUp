@@ -43,12 +43,9 @@ const handleLogin = async (req, res) => {
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '10m' }
         );
-        //saving refresh token in db
-        // foundUser.token = refreshToken;
-        // await foundUser.save();
 
         //salevaza token in redis (cheie: token , valoare: userId)
-        await redisClient.set(accessToken, foundUser.userId, {EX: 300}); //5 minute
+        await redisClient.set(accessToken, foundUser.userId, {EX: 360}); //5 minute
         await redisClient.set(refreshToken, foundUser.userId, { EX: 86400  }); // 1 day
 
         //send token to user as a cookie 

@@ -1,58 +1,67 @@
 const { Conversatii, Mesaje, Users, Notificari } = require('../models');
 const NotificationService = require('../service/NotificationService');
 const EmailService = require("../service/EmailService");
+const { Op } = require("sequelize");
 
 const getAllConversatii = async (req, res) => {
     try {
+        let whereClause = {};
 
         if (req.type === "student") {
-            const conversatii = await Conversatii.findAll({
-                attributes: ['id_conversatie', 'title', 'userId'],
-                where: {
-                    userId: req.userId,
-                },
-                order: [['createdAt', 'DESC']],
-                include: {
-                    model: Users,
-                    attributes: ['userId', 'lastName', 'firstName', 'program_studiu', 'an_studiu', 'facultate']
-                },
-                order: [['createdAt', 'DESC']]
-            });
-            res.status(201).json(conversatii);
-
-            console.log("Conversatii: ", conversatii);
+            whereClause = {
+                [Op.or]: [
+                    { userId: req.userId },
+                    { id_student: req.userId }
+                ]
+            };
         }
 
         if (req.type === "secretar") {
             const user = await Users.findByPk(req.userId);
             if (!user) {
-                return res.status(404).json({ message: "User not found in getAllCereri" });
+                return res.status(404).json({ message: "User not found" });
             }
 
-            const conversatii = await Conversatii.findAll({
-                attributes: ['id_conversatie', 'title', 'userId'],
-                where: {
-                    program_studiu: user.program_studiu,
-                    an_studiu: user.an_studiu
-                },
-                include: {
-                    model: Users,
-                    attributes: ['userId', 'lastName', 'firstName', 'program_studiu', 'an_studiu', 'facultate']
-                },
-                order: [['createdAt', 'DESC']]
-            });
-            res.status(201).json(conversatii);
-
-            console.log("Conversatii: ", conversatii);
+            whereClause = {
+                [Op.or]: [
+                    { userId: req.userId },
+                    { id_secretar: req.userId }
+                ],
+                program_studiu: user.program_studiu,
+                an_studiu: user.an_studiu
+            };
         }
 
+        const conversatii = await Conversatii.findAll({
+            attributes: ['id_conversatie', 'title', 'userId', 'id_student', 'id_secretar'],
+            where: whereClause,
+            include: [
+                {
+                    model: Users,
+                    as: 'student',
+                    attributes: ['userId', 'firstName', 'lastName']
+                },
+                {
+                    model: Users,
+                    as: 'secretar',
+                    attributes: ['userId', 'firstName', 'lastName']
+                },
+                {
+                    model: Users,
+                    attributes: ['userId', 'firstName', 'lastName', 'an_studiu'],
+                }
+            ]
+            ,
+            order: [['createdAt', 'DESC']]
+        });
 
-
+        res.status(200).json(conversatii);
     } catch (err) {
-        console.error("Eroare la getAllCereri:", err);
-        return res.status(500).json({ err: err.message });
+        console.error("Eroare la getAllConversatii:", err);
+        res.status(500).json({ err: err.message });
     }
-}
+};
+
 
 const uploadConversatie = async (req, res) => {
     const { titlu, emailStudent } = req.body;
@@ -73,13 +82,32 @@ const uploadConversatie = async (req, res) => {
 
         const { titlu } = req.body;
 
+        let id_secretar = null;
+        let id_student = null;
+        if (req.type === 'secretar') {
+            id_secretar = req.userId;
+            id_student = targetStudentId;
+        } else if (req.type === 'student') {
+            const secretar = await Users.findOne({
+                where: {
+                    type: 'secretar',
+                    program_studiu: user.program_studiu,
+                    an_studiu: user.an_studiu
+                }
+            });
+            if (secretar) {
+                id_secretar = secretar.userId;
+            }
+            id_student = req.userId;
+        }
+
         const newConversatie = await Conversatii.create({
             userId: req.userId,
             title: titlu,
             program_studiu: user.program_studiu,
             an_studiu: user.an_studiu,
-            id_secretar: req.type === 'secretar' ? req.userId : null,
-            id_student: req.type === 'secretar' ? targetStudentId : null
+            id_secretar,
+            id_student
         });
 
         res.status(201).json({
@@ -138,10 +166,9 @@ const sendMessage = async (req, res) => {
         console.log("Expeditor:", expeditorNume);
         console.log("Tip expeditor:", req.type);
 
-        // Găsim destinatarul în funcție de tipul expeditorului
         let destinatarId = null;
         if (req.type === 'student') {
-            // Dacă expeditorul este student, destinatarul este secretarul
+                
             const secretari = await Users.findAll({
                 where: {
                     type: 'secretar',
@@ -154,9 +181,7 @@ const sendMessage = async (req, res) => {
                 console.log("Destinatar (secretar) găsit:", destinatarId);
             }
         } else if (req.type === 'secretar') {
-            // Dacă expeditorul este secretar, destinatarul este studentul
-            destinatarId = conv.userId;
-            console.log("Destinatar (student) găsit:", destinatarId);
+            destinatarId = conv.id_student;
         }
 
         if (!destinatarId) {
@@ -176,16 +201,13 @@ const sendMessage = async (req, res) => {
                         `Mesaj nou de la ${expeditorNume}`,
                         newMessage
                     );
-                    //console.log("Notificare trimisă cu succes către:", destinatarId);
 
-                    // Salvează notificarea în baza de date
                     await Notificari.create({
                         userId: destinatar.userId,
                         titlu: `Mesaj nou de la ${expeditorNume}`,
                         mesaj: `Ai primit un mesaj: "${newMessage}"`,
                         link_destinatie: `/inbox`,
                     });
-
 
                     // Trimite email
                     await EmailService.sendEmail({
@@ -221,4 +243,7 @@ const sendMessage = async (req, res) => {
 }
 
 
-module.exports = { getAllConversatii, uploadConversatie, sendMessage, getAllMessages }
+module.exports = {
+    getAllConversatii, uploadConversatie,
+    sendMessage, getAllMessages
+}

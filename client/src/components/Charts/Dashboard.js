@@ -10,6 +10,7 @@ import StatisticiEvolutieCereri from './EvolutieInTimp/StatisticiEvolutieCereri'
 import { useState } from 'react';
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import Header from '../Header/Header';
 
 function Dashboard() {
     useFirebaseNotifications();
@@ -57,13 +58,7 @@ function Dashboard() {
             <SideBar />
 
             <main className="main-content">
-                <header className="header">
-                    <h1>Welcome!</h1>
-                    <div className="header-buttons">
-                        <button className="icon-button" aria-label="Notifications">🔔</button>
-                        <button className="icon-button avatar-button" aria-label="Profile">👤</button>
-                    </div>
-                </header>
+                <Header/>
 
                 <div className="stat-nav">
                     <button className={activeTab === "generale" ? "active" : ""} onClick={() => setActiveTab("generale")}>

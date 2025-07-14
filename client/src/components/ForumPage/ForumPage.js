@@ -35,7 +35,6 @@ const ForumPage = () => {
 
     useEffect(() => {
         getConversatii();
-        // eslint-disable-next-line
     }, [axiosPrivate]);
 
     const getMesaje = async () => {
@@ -93,9 +92,18 @@ const ForumPage = () => {
                     >
                         <div className="friends-credent">
                             <span className="friends-name">{conversatie.title}</span>
+
                             <span className="friends-message">
-                                <strong>{conversatie.User ? `${conversatie.User.firstName} ${conversatie.User.lastName}` : '—'}</strong>
+                                Inițiator: <strong>{conversatie.User?.firstName} {conversatie.User?.lastName}</strong>
                             </span>
+                            <span className="friends-message">
+                                Destinatar: <strong>
+                                    {auth.type === "student"
+                                        ? `${conversatie.secretar?.firstName} ${conversatie.secretar?.lastName}`
+                                        : `${conversatie.student?.firstName} ${conversatie.student?.lastName}`}
+                                </strong>
+                            </span>
+
                             <span className="friends-message">{conversatie.User?.facultate}</span>
                             <span className="friends-message">An studiu:{conversatie.User?.an_studiu}</span>
                         </div>

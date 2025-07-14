@@ -116,7 +116,6 @@ const uploadDocumenteSolicitareCerere = async (req, res) => {
         const folderPath = path.join(__dirname, "../uploads/solicitari", String(id_solicitare));
         await fs.promises.mkdir(folderPath, { recursive: true });
 
-        // Încarcă fișiere
         const documente = await Promise.all(
             files.map(async (file) => {
                 const timestamp = Date.now();
@@ -148,36 +147,60 @@ const uploadDocumenteSolicitareCerere = async (req, res) => {
             }
         });
 
-        await Promise.all(secretari.map(sec => {
-            const notificare = sec.fcmToken
+        if (req.type === 'student') {
+            await Promise.all(secretari.map(sec => {
+                const notificare = sec.fcmToken
+                    ? NotificationService.sendNotification(
+                        sec.fcmToken,
+                        "Documente noi încărcate",
+                        `Studentul ${student.firstName} ${student.lastName} a încărcat documente pentru solicitarea (${cerere.title})`
+                    )
+                    : Promise.resolve();
+
+                const email = EmailService.sendEmail({
+                    to: sec.email,
+                    subject: "Documente noi pentru solicitare",
+                    text: `Studentul ${student.firstName} ${student.lastName} a încărcat documente pentru cererea: ${cerere.title}.`,
+                    html: `
+                        <p>Bună ziua,</p>
+                        <p>Studentul <strong>${student.firstName} ${student.lastName}</strong> a încărcat documente pentru cererea:</p>
+                        <ul>
+                            <li><strong>${cerere.title}</strong></li>
+                            <li><strong>Program de studiu:</strong> ${student.program_studiu}</li>
+                            <li><strong>An de studiu:</strong> ${student.an_studiu}</li>
+                        </ul>
+                        <p>Puteți vizualiza documentele în platforma FormUp.</p>
+                        <br/>
+                        <p>Cu stimă,<br/>Echipa FormUp</p>
+                    `
+                });
+
+                return Promise.all([notificare, email]);
+            }));
+        } else if (req.type === 'secretar') {
+            const notificare = student.fcmToken
                 ? NotificationService.sendNotification(
-                    sec.fcmToken,
-                    "Documente noi încărcate",
-                    `Studentul ${student.firstName} ${student.lastName} a încărcat documente pentru solicitarea #${solicitare.id_solicitare} (${cerere.title})`
+                    student.fcmToken,
+                    "Document nou primit de la secretariat",
+                    `Ai primit un document nou pentru solicitarea: ${cerere.title}`
                 )
                 : Promise.resolve();
 
             const email = EmailService.sendEmail({
-                to: sec.email,
-                subject: "Documente noi pentru solicitare existentă",
-                text: `Studentul ${student.firstName} ${student.lastName} a încărcat documente pentru solicitarea #${solicitare.id_solicitare} aferentă cererii: ${cerere.title}.`,
+                to: student.email,
+                subject: "Documente noi primite de la secretariat",
+                text: `Ai primit documente noi pentru cererea: ${cerere.title}.`,
                 html: `
-                    <p>Bună ziua,</p>
-                    <p>Studentul <strong>${student.firstName} ${student.lastName}</strong> a încărcat documente pentru o solicitare existentă:</p>
-                    <ul>
-                        <li><strong>ID solicitare:</strong> ${solicitare.id_solicitare}</li>
-                        <li><strong>Cerere:</strong> ${cerere.title}</li>
-                        <li><strong>Program de studiu:</strong> ${student.program_studiu}</li>
-                        <li><strong>An de studiu:</strong> ${student.an_studiu}</li>
-                    </ul>
-                    <p>Puteți vizualiza documentele în platforma FormUp.</p>
-                    <br/>
+                    <p>Bună, ${student.firstName} ${student.lastName},</p>
+                    <p>Ai primit un document nou pentru solicitarea:</p>
+                    <ul><li><strong>${cerere.title}</strong></li></ul>
+                    <p>Verifică platforma pentru detalii.</p>
                     <p>Cu stimă,<br/>Echipa FormUp</p>
                 `
             });
 
-            return Promise.all([notificare, email]);
-        }));
+            await Promise.all([notificare, email]);
+        }
 
         const notificariPromises = [];
         if (req.body.destinatar) {
@@ -204,14 +227,11 @@ const uploadDocumenteSolicitareCerere = async (req, res) => {
 
         await Promise.all(notificariPromises);
 
-
         res.status(201).json({
             message: "Documentele au fost salvate cu succes!",
             newSolicitare: { id_solicitare: solicitare.id_solicitare },
             documente: documente.map(doc => ({ file_name: doc.file_name }))
         });
-
-
 
     } catch (err) {
         console.error('Eroare uploadDocumenteSolicitareCerere:', err);

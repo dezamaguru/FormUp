@@ -59,10 +59,15 @@ db.Users.hasMany(db.Conversatii, { foreignKey: 'userId' })
 db.Mesaje.belongsTo(db.Conversatii, { foreignKey: 'id_conversatie' })
 db.Conversatii.hasMany(db.Mesaje, { foreignKey: 'id_conversatie' })
 
-db.Solicitari_Cereri.hasMany(db.Documente_Solicitari, {foreignKey: 'id_solicitare'});
-db.Documente_Solicitari.belongsTo(db.Solicitari_Cereri, {foreignKey: 'id_solicitare'});
+db.Solicitari_Cereri.hasMany(db.Documente_Solicitari, { foreignKey: 'id_solicitare' });
+db.Documente_Solicitari.belongsTo(db.Solicitari_Cereri, { foreignKey: 'id_solicitare' });
 
-db.Users.hasMany(db.Notificari, {foreignKey: 'userId'});
-db.Notificari.belongsTo(db.Users, {foreignKey: 'userId'});
+db.Users.hasMany(db.Notificari, { foreignKey: 'userId' });
+db.Notificari.belongsTo(db.Users, { foreignKey: 'userId' });
+
+// Relații suplimentare pentru destinatar conversație
+db.Conversatii.belongsTo(db.Users, { foreignKey: 'id_student', as: 'student' });
+db.Conversatii.belongsTo(db.Users, { foreignKey: 'id_secretar', as: 'secretar' });
+
 
 module.exports = db;
